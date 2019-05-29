@@ -7,3 +7,5 @@ build
 
 # Ignore output
 out
+
+.idea
