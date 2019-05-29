@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-public class BookShelf implements Aggregate<Book> {
+public class BookShelf implements Iterable<Book> {
     private List<Book> books;
 
     BookShelf() {
