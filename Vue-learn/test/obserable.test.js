@@ -63,3 +63,11 @@ test('新增 对象 的属性更新', () => {
   testObj.g[testObj.g.length - 1].h++;
 });
 
+
+test('测试数组本身更新，是否能够', () => {
+  new Watcher(testObj, 'g', function(val) {
+    expect(val).toEqual([2, 2])
+  })
+
+  testObj.g = [2, 2]
+})
