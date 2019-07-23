@@ -1,8 +1,9 @@
 import 'Item.dart';
 import 'Meta.dart';
+import 'PrintHelper.dart';
 import 'dateTime.util.dart' as utils;
 
-class ShoppingCard extends Meta {
+class ShoppingCard extends Meta with PrintHelper {
   DateTime dateTime;
   String code;
 
@@ -20,14 +21,12 @@ class ShoppingCard extends Meta {
     return sum;
   }
 
-  getInfo() {
-    return '''购物车信息:
+  getInfo() => '''购物车信息:
 ------------------------
 用户名: $name
-优惠码: $code
+优惠码: ${code ?? '无'}
 总价:   ${price.toString()}
 日期:   ${utils.format(dateTime, "YYYY-MM-DD HH:mm:ss")}
 ------------------------
-    ''';
-  }
+''';
 }
