@@ -1,6 +1,5 @@
-class Item {
-  double price;
-  String name;
+import 'Meta.dart';
 
-  Item(this.name, this.price);
+class Item extends Meta {
+  Item(name, price): super(name, price);
 }

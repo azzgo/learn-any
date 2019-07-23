@@ -1,15 +1,16 @@
 import 'Item.dart';
+import 'Meta.dart';
+import 'dateTime.util.dart' as utils;
 
-class ShoppingCard {
-  String name;
+class ShoppingCard extends Meta {
   DateTime dateTime;
   String code;
 
   List<Item> bookings;
 
-  ShoppingCard(this.name, this.code): dateTime = DateTime.now();
+  ShoppingCard(name, this.code): dateTime = DateTime.now(), super(name, 0);
 
-  price() {
+  double get price {
     double sum = 0.0;
 
     for (var i in bookings) {
@@ -24,8 +25,8 @@ class ShoppingCard {
 ------------------------
 用户名: $name
 优惠码: $code
-总价:   ${price().toString()}
-日期:   ${dateTime.toString()}
+总价:   ${price.toString()}
+日期:   ${utils.format(dateTime, "YYYY-MM-DD HH:mm:ss")}
 ------------------------
     ''';
   }
