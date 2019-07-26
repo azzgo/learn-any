@@ -1,5 +1,6 @@
 
 import 'package:flutter/material.dart';
+import 'package:flutter_quick_learn/mocks/stickList.dart';
 import 'stickyItem.dart';
 
 class HomePage extends StatefulWidget {
@@ -21,9 +22,7 @@ class _HomePageState extends State<HomePage> {
         title: Text(widget.title),
       ),
       body: ListView(
-        children: <Widget>[
-          StickyItem()
-        ]
+        children: STICKY_LIST_DATA.map((item) => StickyItem(item['title'], item['content'], item['modifyTime'])).toList()
       ),
       floatingActionButton: FloatingActionButton(
         backgroundColor: Colors.brown,
