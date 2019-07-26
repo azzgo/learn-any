@@ -10,7 +10,7 @@ class Sticky {
     id = stickyMap['id'];
     title = stickyMap['title'];
     content = stickyMap['content'];
-    modifyTime = stickyMap['modify_time'];
+    modifyTime = DateTime.parse(stickyMap['modify_time']);
   }
 
   Map<String, dynamic> toMap() {

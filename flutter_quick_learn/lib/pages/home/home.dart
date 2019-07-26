@@ -1,9 +1,8 @@
-
 import 'package:flutter/material.dart';
 import 'package:flutter_quick_learn/db/models/StickyProvider.dart';
 import 'package:flutter_quick_learn/db/models/Sticky.dart';
 import 'stickyItem.dart';
-import 'dart:developer' as developer;
+
 
 class HomePage extends StatefulWidget {
   HomePage({Key key, this.title}) : super(key: key);
@@ -15,7 +14,6 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-
   Iterable<Sticky> stickies;
 
   @override
@@ -25,11 +23,10 @@ class _HomePageState extends State<HomePage> {
   }
 
   void initStickiesData() async {
-    var stickyProvider =  StickyProvider();
+    var stickyProvider = StickyProvider();
     await stickyProvider.open();
     var stickies = await stickyProvider.getStickies();
     this.setState(() {
-      developer.log(stickies.toString());
       this.stickies = stickies;
     });
   }
@@ -37,14 +34,17 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
 
-
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.title),
       ),
       body: ListView(
-        children: stickies != null ? stickies.map((sticky) => StickyItem(sticky.title, sticky.content, sticky.modifyTime.toString())).toList() : []
-      ),
+          children: stickies != null
+              ? stickies
+                  .map((sticky) => StickyItem(sticky.title, sticky.content,
+                      sticky.modifyTime.toString()))
+                  .toList()
+              : []),
       floatingActionButton: FloatingActionButton(
         backgroundColor: Colors.brown,
         tooltip: 'Increment',
