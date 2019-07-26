@@ -2,9 +2,9 @@
 import 'package:flutter/material.dart';
 
 class StickyItem extends StatelessWidget {
-  String title;
-  String content;
-  String modifyTime;
+  final String title;
+  final String content;
+  final String modifyTime;
 
   StickyItem(this.title, this.content, this.modifyTime);
 
