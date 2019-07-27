@@ -1,10 +1,13 @@
 
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+
+final dateFormat = new DateFormat('yyyy-MM-dd HH:mm:ss');
 
 class StickyItem extends StatelessWidget {
   final String title;
   final String content;
-  final String modifyTime;
+  final DateTime modifyTime;
 
   StickyItem(this.title, this.content, this.modifyTime);
 
@@ -22,7 +25,7 @@ class StickyItem extends StatelessWidget {
             children: <Widget>[
               Text(title, style: TextStyle(fontSize:  20)),
               Expanded(child: Text(content)),
-              Text(modifyTime)
+              Text(dateFormat.format(modifyTime))
             ],
         )
       ),

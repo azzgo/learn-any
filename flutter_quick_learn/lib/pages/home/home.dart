@@ -42,7 +42,7 @@ class _HomePageState extends State<HomePage> {
           children: stickies != null
               ? stickies
                   .map((sticky) => StickyItem(sticky.title, sticky.content,
-                      sticky.modifyTime.toString()))
+                      sticky.modifyTime))
                   .toList()
               : []),
       floatingActionButton: FloatingActionButton(

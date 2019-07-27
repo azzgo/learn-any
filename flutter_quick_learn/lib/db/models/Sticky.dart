@@ -10,6 +10,7 @@ class Sticky {
     id = stickyMap['id'];
     title = stickyMap['title'];
     content = stickyMap['content'];
+
     modifyTime = DateTime.parse(stickyMap['modify_time']);
   }
 
