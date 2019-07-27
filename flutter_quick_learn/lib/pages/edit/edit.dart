@@ -17,7 +17,7 @@ class EditStickyPage extends StatelessWidget {
               margin: const EdgeInsets.only(left: 20),
               child: Icon(Icons.vertical_align_top, color: Colors.brown[200])),
           Container(
-              margin: const EdgeInsets.only(left: 20),
+              margin: const EdgeInsets.only(left: 20, right: 10),
               child: Icon(Icons.check, color: Colors.brown[200])),
         ],
       ),

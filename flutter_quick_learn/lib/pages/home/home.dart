@@ -4,7 +4,6 @@ import 'package:flutter_quick_learn/db/models/Sticky.dart';
 import 'package:flutter_quick_learn/pages/edit/edit.dart';
 import 'stickyItem.dart';
 
-
 class HomePage extends StatefulWidget {
   HomePage({Key key, this.title}) : super(key: key);
 
@@ -33,24 +32,29 @@ class _HomePageState extends State<HomePage> {
   }
 
   void navigateToEditPage() {
-    Navigator.push(context, MaterialPageRoute(builder: (context) => EditStickyPage()));
+    Navigator.push(
+        context, MaterialPageRoute(builder: (context) => EditStickyPage()));
   }
 
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.title),
         actions: <Widget>[
-          Icon(Icons.search, color: Colors.brown[200])
+          Container(
+            margin: EdgeInsets.only(right: 10),
+            child: Icon(Icons.search, color: Colors.brown[200]),
+          )
         ],
       ),
       body: ListView(
           children: stickies != null
               ? stickies
-                  .map((sticky) => StickyItem(sticky.title, sticky.content,
-                      sticky.modifyTime))
+                  .map((sticky) => new GestureDetector(
+                      onTap: navigateToEditPage,
+                      child: StickyItem(
+                          sticky.title, sticky.content, sticky.modifyTime)))
                   .toList()
               : []),
       floatingActionButton: FloatingActionButton(

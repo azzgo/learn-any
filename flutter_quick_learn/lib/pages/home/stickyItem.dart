@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
@@ -13,23 +12,19 @@ class StickyItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
-
     return Card(
       child: Container(
-        height: 130,
-        padding: EdgeInsets.all(10),
-        child: Column(
+          height: 130,
+          padding: EdgeInsets.all(10),
+          child: Column(
             mainAxisSize: MainAxisSize.max,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
-              Text(title, style: TextStyle(fontSize:  20)),
+              Text(title, style: TextStyle(fontSize: 20)),
               Expanded(child: Text(content)),
               Text(dateFormat.format(modifyTime))
             ],
-        )
-      ),
+          )),
     );
   }
-
 }
