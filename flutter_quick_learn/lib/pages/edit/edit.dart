@@ -1,6 +1,37 @@
 import 'package:flutter/material.dart';
 
-class EditStickyPage extends StatelessWidget {
+class EditStickyPage extends StatefulWidget {
+  int id;
+  String title;
+  String content;
+
+  EditStickyPage({this.id, this.title, this.content});
+
+  @override
+  State<StatefulWidget> createState() {
+    return _EditStickyPageState(
+        id: this.id, title: this.title, content: this.content);
+  }
+}
+
+class _EditStickyPageState extends State<EditStickyPage> {
+  int id;
+  String title;
+  String content;
+
+  final _titleController = TextEditingController();
+  final _contentController = TextEditingController();
+
+  _EditStickyPageState({this.id, this.title, this.content});
+
+  @override
+  void initState() {
+    super.initState();
+    _titleController.value = _titleController.value.copyWith(text: this.title);
+    _contentController.value =
+        _contentController.value.copyWith(text: this.content);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -25,8 +56,20 @@ class EditStickyPage extends StatelessWidget {
         padding: const EdgeInsets.all(10),
         child: Column(
           children: <Widget>[
-            TextField(decoration: InputDecoration(hintText: "标题")),
-            TextField(decoration: InputDecoration.collapsed(hintText: "内容"))
+            TextField(
+              controller: _titleController,
+              decoration: InputDecoration(hintText: "标题"),
+              style: TextStyle(fontSize: 20),
+            ),
+            Expanded(
+              child: Container(
+                  margin: EdgeInsets.only(top: 10),
+                  child: TextField(
+                    controller: _contentController,
+                    decoration: InputDecoration.collapsed(hintText: "内容"),
+                    maxLines: null,
+                  )),
+            )
           ],
         ),
       ),

@@ -33,9 +33,15 @@ class _HomePageState extends State<HomePage> {
     stickyProvider.close();
   }
 
-  void navigateToEditPage() {
+  void navigateToEditPage({int id, String title, String content}) {
     Navigator.push(
-        context, MaterialPageRoute(builder: (context) => EditStickyPage()));
+        context,
+        MaterialPageRoute(
+            builder: (context) => EditStickyPage(
+                  id: id,
+                  title: title,
+                  content: content,
+                )));
   }
 
   void navigateToSearchPage() {
@@ -57,8 +63,11 @@ class _HomePageState extends State<HomePage> {
       body: ListView.builder(
         itemBuilder: (context, index) {
           var sticky = stickies.toList()[index];
-          return StickyItem(
-              sticky.title, sticky.content, sticky.modifyTime);
+          return GestureDetector(
+              onTap: () => navigateToEditPage(
+                  title: sticky.title, content: sticky.content, id: sticky.id),
+              child:
+                  StickyItem(sticky.title, sticky.content, sticky.modifyTime));
         },
         itemExtent: 130,
         itemCount: stickies.length,
