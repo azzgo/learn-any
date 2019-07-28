@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_quick_learn/db/models/StickyProvider.dart';
 import 'package:flutter_quick_learn/db/models/Sticky.dart';
 import 'package:flutter_quick_learn/pages/edit/edit.dart';
+import 'package:flutter_quick_learn/pages/search/search.dart';
 import 'stickyItem.dart';
 
 class HomePage extends StatefulWidget {
@@ -29,11 +30,17 @@ class _HomePageState extends State<HomePage> {
     this.setState(() {
       this.stickies = stickies;
     });
+    stickyProvider.close();
   }
 
   void navigateToEditPage() {
     Navigator.push(
         context, MaterialPageRoute(builder: (context) => EditStickyPage()));
+  }
+
+  void navigateToSearchPage() {
+    Navigator.push(
+        context, MaterialPageRoute(builder: (context) => SearchPage()));
   }
 
   @override
@@ -42,21 +49,20 @@ class _HomePageState extends State<HomePage> {
       appBar: AppBar(
         title: Text(widget.title),
         actions: <Widget>[
-          Container(
-            margin: EdgeInsets.only(right: 10),
-            child: Icon(Icons.search, color: Colors.brown[200]),
-          )
+          IconButton(
+              icon: Icon(Icons.search, color: Colors.brown[200]),
+              onPressed: navigateToSearchPage),
         ],
       ),
-      body: ListView(
-          children: stickies != null
-              ? stickies
-                  .map((sticky) => new GestureDetector(
-                      onTap: navigateToEditPage,
-                      child: StickyItem(
-                          sticky.title, sticky.content, sticky.modifyTime)))
-                  .toList()
-              : []),
+      body: ListView.builder(
+        itemBuilder: (context, index) {
+          var sticky = stickies.toList()[index];
+          return StickyItem(
+              sticky.title, sticky.content, sticky.modifyTime);
+        },
+        itemExtent: 130,
+        itemCount: stickies.length,
+      ),
       floatingActionButton: FloatingActionButton(
         backgroundColor: Colors.brown,
         tooltip: 'Increment',
