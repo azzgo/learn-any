@@ -16,16 +16,14 @@ class EditStickyPage extends StatefulWidget {
 }
 
 class _EditStickyPageState extends State<EditStickyPage> {
-  final _titleController = TextEditingController();
-  final _contentController = TextEditingController();
+  TextEditingController _titleController;
+  TextEditingController _contentController;
 
   @override
   void initState() {
     super.initState();
-    _titleController.value =
-        _titleController.value.copyWith(text: widget.title);
-    _contentController.value =
-        _contentController.value.copyWith(text: widget.content);
+    _titleController = TextEditingController(text: widget.title);
+    _contentController =  TextEditingController(text: widget.content);
   }
 
   void _saveSticky () async {
