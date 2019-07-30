@@ -9,27 +9,22 @@ class EditStickyPage extends StatefulWidget {
 
   @override
   State<StatefulWidget> createState() {
-    return _EditStickyPageState(
-        id: this.id, title: this.title, content: this.content);
+    return _EditStickyPageState();
   }
 }
 
 class _EditStickyPageState extends State<EditStickyPage> {
-  int id;
-  String title;
-  String content;
 
   final _titleController = TextEditingController();
   final _contentController = TextEditingController();
 
-  _EditStickyPageState({this.id, this.title, this.content});
 
   @override
   void initState() {
     super.initState();
-    _titleController.value = _titleController.value.copyWith(text: this.title);
+    _titleController.value = _titleController.value.copyWith(text: widget.title);
     _contentController.value =
-        _contentController.value.copyWith(text: this.content);
+        _contentController.value.copyWith(text: widget.content);
   }
 
   @override
