@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_quick_learn/db/models/StickyProvider.dart';
+import 'package:flutter_quick_learn/db/models/Sticky.dart';
 
 class EditStickyPage extends StatefulWidget {
   int id;
@@ -14,17 +16,42 @@ class EditStickyPage extends StatefulWidget {
 }
 
 class _EditStickyPageState extends State<EditStickyPage> {
-
   final _titleController = TextEditingController();
   final _contentController = TextEditingController();
-
 
   @override
   void initState() {
     super.initState();
-    _titleController.value = _titleController.value.copyWith(text: widget.title);
+    _titleController.value =
+        _titleController.value.copyWith(text: widget.title);
     _contentController.value =
         _contentController.value.copyWith(text: widget.content);
+  }
+
+  void _saveSticky () async {
+    StickyProvider stickyProvider = new StickyProvider();
+    await stickyProvider.open();
+
+    if (widget.id == null) {
+      var sticky = await _createSticky(stickyProvider);
+      widget.id = sticky.id;
+    } else {
+      await _updateSticky(stickyProvider);
+    }
+
+    await stickyProvider.close();
+  }
+
+  Future _createSticky(StickyProvider stickyProvider) {
+    return stickyProvider.insertSticky(Sticky(title: _titleController.text, content: _contentController.text));
+  }
+
+  Future _updateSticky(StickyProvider stickyProvider) {
+    return stickyProvider.updateSticky(Sticky.fromMap({
+      "id": widget.id,
+      "title": _titleController.text,
+      "content": _contentController.text
+    }));
   }
 
   @override
@@ -44,7 +71,9 @@ class _EditStickyPageState extends State<EditStickyPage> {
               child: Icon(Icons.vertical_align_top, color: Colors.brown[200])),
           Container(
               margin: const EdgeInsets.only(left: 20, right: 15),
-              child: Icon(Icons.check, color: Colors.brown[200])),
+              child: IconButton(
+                  icon: Icon(Icons.check, color: Colors.brown[200]),
+                  onPressed: _saveSticky)),
         ],
       ),
       body: Container(

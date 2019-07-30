@@ -14,7 +14,7 @@ class HomePage extends StatefulWidget {
   _HomePageState createState() => _HomePageState();
 }
 
-class _HomePageState extends State<HomePage> {
+class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   Iterable<Sticky> stickies;
 
   @override
@@ -22,6 +22,7 @@ class _HomePageState extends State<HomePage> {
     super.initState();
     initStickiesData();
   }
+
 
   void initStickiesData() async {
     var stickyProvider = StickyProvider();
@@ -33,8 +34,8 @@ class _HomePageState extends State<HomePage> {
     stickyProvider.close();
   }
 
-  void navigateToEditPage({int id, String title, String content}) {
-    Navigator.push(
+  void navigateToEditPage({int id, String title, String content}) async {
+    await Navigator.push(
         context,
         MaterialPageRoute(
             builder: (context) => EditStickyPage(
@@ -42,6 +43,7 @@ class _HomePageState extends State<HomePage> {
                   title: title,
                   content: content,
                 )));
+    this.initStickiesData();
   }
 
   void navigateToSearchPage() {
@@ -70,7 +72,7 @@ class _HomePageState extends State<HomePage> {
                   StickyItem(sticky.title, sticky.content, sticky.modifyTime));
         },
         itemExtent: 130,
-        itemCount: stickies.length,
+        itemCount: (stickies ?? []).length,
       ),
       floatingActionButton: FloatingActionButton(
         backgroundColor: Colors.brown,

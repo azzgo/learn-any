@@ -56,6 +56,7 @@ class StickyProvider {
   }
 
   Future<int> updateSticky(Sticky sticky) async {
+    sticky.modifyTime = DateTime.now();
     return db.update(tableName, sticky.toMap(),
         where: 'id=?', whereArgs: [sticky.id]);
   }

@@ -1,3 +1,8 @@
+import 'package:intl/intl.dart';
+
+final dateFormat = new DateFormat('yyyy-MM-dd HH:mm:ss');
+
+
 class Sticky {
   int id;
   String title;
@@ -11,7 +16,9 @@ class Sticky {
     title = stickyMap['title'];
     content = stickyMap['content'];
 
-    modifyTime = DateTime.parse(stickyMap['modify_time']);
+    try {
+      modifyTime = DateTime.parse(stickyMap['modify_time']);
+    } catch(e) {}
   }
 
   Map<String, dynamic> toMap() {
@@ -19,7 +26,7 @@ class Sticky {
       "id": id,
       "title": title,
       "content": content,
-      "modify_time": modifyTime
+      "modify_time": dateFormat.format(modifyTime)
     };
   }
 }
