@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:quiver/strings.dart';
 import 'package:flutter_quick_learn/db/models/StickyProvider.dart';
 import 'package:flutter_quick_learn/db/models/Sticky.dart';
 
@@ -23,10 +24,15 @@ class _EditStickyPageState extends State<EditStickyPage> {
   void initState() {
     super.initState();
     _titleController = TextEditingController(text: widget.title);
-    _contentController =  TextEditingController(text: widget.content);
+    _contentController = TextEditingController(text: widget.content);
   }
 
-  void _saveSticky () async {
+  void _saveSticky() async {
+    if (!_validateData()) {
+      Navigator.pop(context);
+      return;
+    }
+
     StickyProvider stickyProvider = new StickyProvider();
     await stickyProvider.open();
 
@@ -40,8 +46,17 @@ class _EditStickyPageState extends State<EditStickyPage> {
     await stickyProvider.close();
   }
 
+  bool _validateData() {
+    if (isEmpty(_titleController.text) && isEmpty(_contentController.text)) {
+      return false;
+    }
+
+    return true;
+  }
+
   Future _createSticky(StickyProvider stickyProvider) {
-    return stickyProvider.insertSticky(Sticky(title: _titleController.text, content: _contentController.text));
+    return stickyProvider.insertSticky(
+        Sticky(title: _titleController.text, content: _contentController.text));
   }
 
   Future _updateSticky(StickyProvider stickyProvider) {
@@ -50,6 +65,18 @@ class _EditStickyPageState extends State<EditStickyPage> {
       "title": _titleController.text,
       "content": _contentController.text
     }));
+  }
+
+  _deleteSticky() async {
+    StickyProvider stickyProvider = new StickyProvider();
+    await stickyProvider.open();
+    if (widget.id != null) {
+      await stickyProvider.deleteSticky(widget.id);
+    }
+    await stickyProvider.close();
+
+    Navigator.pop(context);
+    return;
   }
 
   @override
@@ -68,7 +95,13 @@ class _EditStickyPageState extends State<EditStickyPage> {
               margin: const EdgeInsets.only(left: 20),
               child: Icon(Icons.vertical_align_top, color: Colors.brown[200])),
           Container(
-              margin: const EdgeInsets.only(left: 20, right: 15),
+            margin: const EdgeInsets.only(left: 20),
+            child: IconButton(
+                icon: Icon(Icons.delete, color: Colors.brown[200]),
+                onPressed: _deleteSticky),
+          ),
+          Container(
+              margin: const EdgeInsets.only(left: 10, right: 5),
               child: IconButton(
                   icon: Icon(Icons.check, color: Colors.brown[200]),
                   onPressed: _saveSticky)),
