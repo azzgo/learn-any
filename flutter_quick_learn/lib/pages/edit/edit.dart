@@ -4,9 +4,9 @@ import 'package:flutter_quick_learn/db/models/StickyProvider.dart';
 import 'package:flutter_quick_learn/db/models/Sticky.dart';
 
 class EditStickyPage extends StatefulWidget {
-  int id;
-  String title;
-  String content;
+  final int id;
+  final String title;
+  final String content;
 
   EditStickyPage({this.id, this.title, this.content});
 
@@ -20,11 +20,25 @@ class _EditStickyPageState extends State<EditStickyPage> {
   TextEditingController _titleController;
   TextEditingController _contentController;
 
+  Sticky _sticky;
+
+  _EditStickyPageState() {
+    _sticky = Sticky(title: widget.title, content: widget.content);
+    _sticky.id = widget.id;
+  }
+
   @override
   void initState() {
     super.initState();
-    _titleController = TextEditingController(text: widget.title);
-    _contentController = TextEditingController(text: widget.content);
+
+    _titleController = TextEditingController(text: _sticky.title)
+      ..addListener(() {
+        _sticky.title = _titleController.text;
+      });
+    _contentController = TextEditingController(text: _sticky.content)
+      ..addListener(() {
+        _sticky.content = _contentController.text;
+      });
   }
 
   void _saveSticky() async {
@@ -36,9 +50,8 @@ class _EditStickyPageState extends State<EditStickyPage> {
     StickyProvider stickyProvider = new StickyProvider();
     await stickyProvider.open();
 
-    if (widget.id == null) {
-      var sticky = await _createSticky(stickyProvider);
-      widget.id = sticky.id;
+    if (_sticky.id == null) {
+      _sticky.id = await _createSticky(stickyProvider);
     } else {
       await _updateSticky(stickyProvider);
     }
@@ -60,18 +73,14 @@ class _EditStickyPageState extends State<EditStickyPage> {
   }
 
   Future _updateSticky(StickyProvider stickyProvider) {
-    return stickyProvider.updateSticky(Sticky.fromMap({
-      "id": widget.id,
-      "title": _titleController.text,
-      "content": _contentController.text
-    }));
+    return stickyProvider.updateSticky(_sticky);
   }
 
   _deleteSticky() async {
     StickyProvider stickyProvider = new StickyProvider();
     await stickyProvider.open();
-    if (widget.id != null) {
-      await stickyProvider.deleteSticky(widget.id);
+    if (_sticky.id != null) {
+      await stickyProvider.deleteSticky(_sticky.id);
     }
     await stickyProvider.close();
 

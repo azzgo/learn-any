@@ -14,7 +14,7 @@ class StickyProvider {
         onCreate: (db, version) {
       var batch = db.batch();
       batch.execute(
-          'CREATE TABLE $tableName (id INTEGER PRIMARY KEY, title TEXT, content TEXT, modify_time DATETIME);');
+          'CREATE TABLE $tableName (id INTEGER PRIMARY KEY, title TEXT, content TEXT, isTop INTEGER DEFAULT 0, modify_time DATETIME);');
 
       batch.insert(tableName, {
         "title": "欢迎使用便签",
@@ -41,18 +41,21 @@ class StickyProvider {
       });
 
       batch.commit();
-    }, version: 1);
+    }, onUpgrade: (db, oldVersion, newVersion) {
+      print("oldVersion $oldVersion");
+      if (oldVersion == 1) {
+        db.execute("ALTER TABLE $tableName ADD isTop INTEGER DEFAULT 0;");
+      }
+    }, version: 2);
   }
 
   Future close() async {
     db.close();
   }
 
-  Future<Sticky> insertSticky(Sticky sticky) async {
+  Future<int> insertSticky(Sticky sticky) async {
     sticky.modifyTime = DateTime.now();
-    sticky.id = await db.insert(tableName, sticky.toMap());
-
-    return sticky;
+    return await db.insert(tableName, sticky.toMap());
   }
 
   Future<int> updateSticky(Sticky sticky) async {
