@@ -10,11 +10,11 @@ class StickyProvider {
   Database db;
 
   Future open() async {
-    
     db = await openDatabase(join(await getDatabasesPath(), 'stickies.db'),
         onCreate: (db, version) {
       var batch = db.batch();
-      batch.execute('CREATE TABLE $tableName (id INTEGER PRIMARY KEY, title TEXT, content TEXT, modify_time DATETIME);');
+      batch.execute(
+          'CREATE TABLE $tableName (id INTEGER PRIMARY KEY, title TEXT, content TEXT, modify_time DATETIME);');
 
       batch.insert(tableName, {
         "title": "欢迎使用便签",
@@ -83,5 +83,15 @@ class StickyProvider {
     }
 
     return null;
+  }
+
+  Future<Iterable<Sticky>> fuzzyQuery(String query) async {
+    List<Map> stickies = await db.query(tableName,
+        columns: ['title', 'content', 'id', 'modify_time'],
+        where: 'title LIKE ? OR content LIKE ?',
+        whereArgs: ['%$query%', '%$query%'],
+        limit: 20);
+
+    return stickies.map((stickyMap) => Sticky.fromMap(stickyMap));
   }
 }
