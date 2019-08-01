@@ -60,11 +60,14 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
           var sticky = stickies.toList()[index];
           return GestureDetector(
               onTap: () => navigateToEditPage(id: sticky.id),
+              onLongPressEnd: (longPressDetails) {
+                print(longPressDetails);
+              },
               child:
                   StickyItem(sticky.title, sticky.content, sticky.modifyTime));
         },
         itemExtent: 130,
-        itemCount: (stickies ?? []).length,
+        itemCount: stickies?.length ?? 0,
       ),
       floatingActionButton: FloatingActionButton(
         backgroundColor: Colors.brown,
