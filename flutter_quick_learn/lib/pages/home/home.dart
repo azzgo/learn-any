@@ -3,6 +3,7 @@ import 'package:flutter_quick_learn/db/models/StickyProvider.dart';
 import 'package:flutter_quick_learn/db/models/Sticky.dart';
 import 'package:flutter_quick_learn/pages/edit/edit.dart';
 import 'package:flutter_quick_learn/pages/search/search.dart';
+import 'models/StickyWithChecked.dart';
 import 'stickyItem.dart';
 
 class HomePage extends StatefulWidget {
@@ -33,7 +34,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     }
 
     if (!val) {
-      _mupltipleStickies =  null;
+      _mupltipleStickies = null;
     }
     this._isMutipleMode = val;
   }
@@ -72,110 +73,108 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   }
 
   AppBar _getAppBar() {
-    if (isMultipleMode) {
-      return AppBar(
-        leading: IconButton(
-            icon: Icon(Icons.close),
+    return AppBar(
+      title: Text(widget.title),
+      actions: <Widget>[
+        IconButton(
+            icon: Icon(Icons.search, color: Colors.brown[200]),
+            onPressed: navigateToSearchPage),
+      ],
+    );
+  }
+
+  AppBar _getCheckableListViewAppBar() {
+    return AppBar(
+      leading: IconButton(
+          icon: Icon(Icons.close),
+          onPressed: () {
+            setState(() {
+              isMultipleMode = false;
+            });
+          }),
+      actions: <Widget>[
+        IconButton(
+          icon: Icon(Icons.delete),
+          onPressed: () async {
+            StickyProvider stickyProvider = StickyProvider();
+            await stickyProvider.open();
+            _mupltipleStickies.where((item) => item.checked).forEach((item) {
+              stickyProvider.deleteSticky(item.sticky.id);
+            });
+
+            await stickyProvider.close();
+
+            this.isMultipleMode = false;
+
+            this.initStickiesData();
+          },
+        ),
+        IconButton(
+            icon: Icon(
+              Icons.check_box,
+              color: Colors.white,
+            ),
             onPressed: () {
-              setState(() {
-                isMultipleMode = false;
-              });
-            }),
-        actions: <Widget>[
-          IconButton(
-            icon: Icon(Icons.delete),
-            onPressed: () async {
-              StickyProvider stickyProvider = StickyProvider();
-              await stickyProvider.open();
-              _mupltipleStickies.where((item) => item.checked).forEach((item) {
-                stickyProvider.deleteSticky(item.sticky.id);
-              });
-
-              await stickyProvider.close();
-
-              this.isMultipleMode = false;
-
-              this.initStickiesData();
-
-            },
-          ),
-          IconButton(
-              icon: Icon(
-                Icons.check_box,
-                color: Colors.white,
-              ),
-              onPressed: () {
-                if (_mupltipleStickies.every((item) => item.checked)) {
-                  _mupltipleStickies.forEach((item) {
-                    item.checked = false;
-                  });
-                } else {
-                  _mupltipleStickies.forEach((item) {
-                    item.checked = true;
-                  });
-                }
-                this.setState(() {});
-              })
-        ],
-      );
-    } else {
-      return AppBar(
-        title: Text(widget.title),
-        actions: <Widget>[
-          IconButton(
-              icon: Icon(Icons.search, color: Colors.brown[200]),
-              onPressed: navigateToSearchPage),
-        ],
-      );
-    }
+              if (_mupltipleStickies.every((item) => item.checked)) {
+                _mupltipleStickies.forEach((item) {
+                  item.checked = false;
+                });
+              } else {
+                _mupltipleStickies.forEach((item) {
+                  item.checked = true;
+                });
+              }
+              this.setState(() {});
+            })
+      ],
+    );
   }
 
   ListView _getListView() {
-    if (isMultipleMode) {
-      return ListView.builder(
-        itemBuilder: (context, index) {
-          var stickyWithChecked = _mupltipleStickies[index];
-          var sticky = stickyWithChecked.sticky;
-          return GestureDetector(
-              onTap: () => {
-                    setState(() {
-                      stickyWithChecked.checked = !stickyWithChecked.checked;
-                    })
-                  },
-              child: Row(children: <Widget>[
-                Icon(stickyWithChecked.checked
-                    ? Icons.check_box
-                    : Icons.check_box_outline_blank),
-                Expanded(
-                  child: StickyItem(
-                      sticky.title, sticky.content, sticky.modifyTime),
-                )
-              ]));
-        },
-        itemExtent: 130,
-        itemCount: _mupltipleStickies?.length ?? 0,
-      );
-    } else {
-      return ListView.builder(
-        itemBuilder: (context, index) {
-          var sticky = _stickies[index];
-          return GestureDetector(
-              onTap: () => navigateToEditPage(id: sticky.id),
-              onLongPress: _enterMultipleMode,
-              child:
-                  StickyItem(sticky.title, sticky.content, sticky.modifyTime));
-        },
-        itemExtent: 130,
-        itemCount: _stickies?.length ?? 0,
-      );
-    }
+    return ListView.builder(
+      itemBuilder: (context, index) {
+        var sticky = _stickies[index];
+        return GestureDetector(
+            onTap: () => navigateToEditPage(id: sticky.id),
+            onLongPress: _enterMultipleMode,
+            child: StickyItem(sticky.title, sticky.content, sticky.modifyTime));
+      },
+      itemExtent: 130,
+      itemCount: _stickies?.length ?? 0,
+    );
+  }
+
+  ListView _getCheckableListView() {
+    return ListView.builder(
+      itemBuilder: (context, index) {
+        var stickyWithChecked = _mupltipleStickies[index];
+        var sticky = stickyWithChecked.sticky;
+        return GestureDetector(
+            onTap: () => {
+                  setState(() {
+                    stickyWithChecked.checked = !stickyWithChecked.checked;
+                  })
+                },
+            child: Row(children: <Widget>[
+              Icon(stickyWithChecked.checked
+                  ? Icons.check_box
+                  : Icons.check_box_outline_blank),
+              Expanded(
+                child:
+                    StickyItem(sticky.title, sticky.content, sticky.modifyTime),
+              )
+            ]));
+      },
+      itemExtent: 130,
+      itemCount: _mupltipleStickies?.length ?? 0,
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: _getAppBar(),
-      body: _getListView(),
+      appBar: isMultipleMode? _getCheckableListViewAppBar() : _getAppBar(),
+      body: isMultipleMode ? _getCheckableListView() : _getListView(),
       floatingActionButton: FloatingActionButton(
         backgroundColor: Colors.brown,
         tooltip: '增加便签',
@@ -184,11 +183,4 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
       ),
     );
   }
-}
-
-class StickyWithChecked {
-  Sticky sticky;
-  bool checked;
-
-  StickyWithChecked({this.sticky, this.checked});
 }
