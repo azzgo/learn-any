@@ -5,10 +5,8 @@ import 'package:flutter_quick_learn/db/models/Sticky.dart';
 
 class EditStickyPage extends StatefulWidget {
   final int id;
-  final String title;
-  final String content;
 
-  EditStickyPage({this.id, this.title, this.content});
+  EditStickyPage({this.id});
 
   @override
   State<StatefulWidget> createState() {
@@ -20,16 +18,24 @@ class _EditStickyPageState extends State<EditStickyPage> {
   TextEditingController _titleController;
   TextEditingController _contentController;
 
-  Sticky _sticky;
-
-  _EditStickyPageState() {
-    _sticky = Sticky(title: widget.title, content: widget.content);
-    _sticky.id = widget.id;
-  }
+  Sticky _sticky = Sticky();
 
   @override
   void initState() {
     super.initState();
+
+    this._initStiky();
+  }
+
+  void _initStiky() async {
+    StickyProvider stickyProvider = StickyProvider();
+    await stickyProvider.open();
+
+    if (widget.id != null) {
+      _sticky = await stickyProvider.getSticky(widget.id);
+    }
+
+    await stickyProvider.close();
 
     _titleController = TextEditingController(text: _sticky.title)
       ..addListener(() {
@@ -39,6 +45,9 @@ class _EditStickyPageState extends State<EditStickyPage> {
       ..addListener(() {
         _sticky.content = _contentController.text;
       });
+
+    // 因为 setState 的回调函数，不能声明为 async, 需要异步工作做完后，同步调用
+    this.setState(() => null);
   }
 
   void _saveSticky() async {
@@ -88,6 +97,12 @@ class _EditStickyPageState extends State<EditStickyPage> {
     return;
   }
 
+  void _toggleFixTop() {
+    setState(() {
+      _sticky.isTop = !_sticky.isTop;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -101,16 +116,19 @@ class _EditStickyPageState extends State<EditStickyPage> {
               margin: const EdgeInsets.only(left: 20),
               child: Icon(Icons.alarm, color: Colors.brown[200])),
           Container(
-              margin: const EdgeInsets.only(left: 20),
-              child: Icon(Icons.vertical_align_top, color: Colors.brown[200])),
+              margin: const EdgeInsets.only(left: 15),
+              child: IconButton(
+                  icon: Icon(Icons.vertical_align_top,
+                      color: _sticky.isTop ? Colors.white : Colors.brown[200]),
+                  onPressed: _toggleFixTop)),
           Container(
-            margin: const EdgeInsets.only(left: 20),
+            margin: const EdgeInsets.only(left: 5),
             child: IconButton(
                 icon: Icon(Icons.delete, color: Colors.brown[200]),
                 onPressed: _deleteSticky),
           ),
           Container(
-              margin: const EdgeInsets.only(left: 10, right: 5),
+              margin: const EdgeInsets.only(left: 5, right: 5),
               child: IconButton(
                   icon: Icon(Icons.check, color: Colors.brown[200]),
                   onPressed: _saveSticky)),

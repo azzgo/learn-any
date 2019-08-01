@@ -16,7 +16,7 @@ class Sticky {
     id = stickyMap['id'];
     title = stickyMap['title'];
     content = stickyMap['content'];
-    isTop = stickyMap["isTop"] == 1;
+    isTop = stickyMap["is_top"] == 1;
 
     try {
       modifyTime = DateTime.parse(stickyMap['modify_time']);
@@ -28,7 +28,7 @@ class Sticky {
       "id": id,
       "title": title,
       "content": content,
-      "isTop": isTop == true ? 1 : 0,
+      "is_top": isTop == true ? 1 : 0,
       "modify_time": dateFormat.format(modifyTime)
     };
   }

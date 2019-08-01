@@ -14,7 +14,7 @@ class StickyProvider {
         onCreate: (db, version) {
       var batch = db.batch();
       batch.execute(
-          'CREATE TABLE $tableName (id INTEGER PRIMARY KEY, title TEXT, content TEXT, isTop INTEGER DEFAULT 0, modify_time DATETIME);');
+          'CREATE TABLE $tableName (id INTEGER PRIMARY KEY, title TEXT, content TEXT, is_top INTEGER DEFAULT 0, modify_time TEXT);');
 
       batch.insert(tableName, {
         "title": "欢迎使用便签",
@@ -44,7 +44,7 @@ class StickyProvider {
     }, onUpgrade: (db, oldVersion, newVersion) {
       print("oldVersion $oldVersion");
       if (oldVersion == 1) {
-        db.execute("ALTER TABLE $tableName ADD isTop INTEGER DEFAULT 0;");
+        db.execute("ALTER TABLE $tableName ADD is_top INTEGER DEFAULT 0;");
       }
     }, version: 2);
   }
@@ -70,14 +70,15 @@ class StickyProvider {
 
   Future<Iterable<Sticky>> getStickies() async {
     List<Map> stickies = await db.query(tableName,
-        columns: ['title', 'content', 'id', 'modify_time'], where: '1=1');
-
+        columns: ['title', 'content', 'id', 'modify_time', 'is_top'], where: '1=1',
+        orderBy: 'is_top DESC, datetime(modify_time) DESC');
+    
     return stickies.map((stickyMap) => Sticky.fromMap(stickyMap));
   }
 
   Future<Sticky> getSticky(int id) async {
     List<Map> stickies = await db.query(tableName,
-        columns: ['title', 'content', 'id', 'modify_time'],
+        columns: ['title', 'content', 'id', 'modify_time', 'is_top'],
         where: 'id=?',
         whereArgs: [id]);
 

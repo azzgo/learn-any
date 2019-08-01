@@ -23,7 +23,6 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     initStickiesData();
   }
 
-
   void initStickiesData() async {
     var stickyProvider = StickyProvider();
     await stickyProvider.open();
@@ -34,15 +33,9 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     stickyProvider.close();
   }
 
-  void navigateToEditPage({int id, String title, String content}) async {
-    await Navigator.push(
-        context,
-        MaterialPageRoute(
-            builder: (context) => EditStickyPage(
-                  id: id,
-                  title: title,
-                  content: content,
-                )));
+  void navigateToEditPage({int id}) async {
+    await Navigator.push(context,
+        MaterialPageRoute(builder: (context) => EditStickyPage(id: id)));
     this.initStickiesData();
   }
 
@@ -66,8 +59,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
         itemBuilder: (context, index) {
           var sticky = stickies.toList()[index];
           return GestureDetector(
-              onTap: () => navigateToEditPage(
-                  title: sticky.title, content: sticky.content, id: sticky.id),
+              onTap: () => navigateToEditPage(id: sticky.id),
               child:
                   StickyItem(sticky.title, sticky.content, sticky.modifyTime));
         },
