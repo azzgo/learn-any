@@ -111,7 +111,7 @@ class _EditStickyPageState extends State<EditStickyPage> {
       appBar: AppBar(
         leading: IconButton(
           icon: Icon(Icons.arrow_back, color: Colors.brown[200]),
-          onPressed: () => Navigator.pop(context),
+          onPressed: _saveSticky,
         ),
         actions: <Widget>[
           Container(
@@ -124,16 +124,11 @@ class _EditStickyPageState extends State<EditStickyPage> {
                       color: _sticky.isTop ? Colors.white : Colors.brown[200]),
                   onPressed: _toggleFixTop)),
           Container(
-            margin: const EdgeInsets.only(left: 5),
+            margin: const EdgeInsets.only(left: 5, right: 5),
             child: IconButton(
                 icon: Icon(Icons.delete, color: Colors.brown[200]),
                 onPressed: _deleteSticky),
-          ),
-          Container(
-              margin: const EdgeInsets.only(left: 5, right: 5),
-              child: IconButton(
-                  icon: Icon(Icons.check, color: Colors.brown[200]),
-                  onPressed: _saveSticky)),
+          )
         ],
       ),
       body: Container(
