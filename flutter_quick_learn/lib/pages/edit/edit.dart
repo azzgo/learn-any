@@ -66,6 +66,8 @@ class _EditStickyPageState extends State<EditStickyPage> {
     }
 
     await stickyProvider.close();
+
+    Navigator.pop(context);
   }
 
   bool _validateData() {
