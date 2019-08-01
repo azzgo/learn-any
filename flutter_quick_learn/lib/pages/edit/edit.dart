@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:quiver/strings.dart';
 import 'package:flutter_quick_learn/db/models/StickyProvider.dart';
 import 'package:flutter_quick_learn/db/models/Sticky.dart';
 
@@ -20,6 +19,8 @@ class _EditStickyPageState extends State<EditStickyPage> {
 
   Sticky _sticky = Sticky();
 
+  bool _isDirty = false;
+
   @override
   void initState() {
     super.initState();
@@ -39,10 +40,12 @@ class _EditStickyPageState extends State<EditStickyPage> {
 
     _titleController = TextEditingController(text: _sticky.title)
       ..addListener(() {
+        _isDirty = true;
         _sticky.title = _titleController.text;
       });
     _contentController = TextEditingController(text: _sticky.content)
       ..addListener(() {
+        _isDirty = true;
         _sticky.content = _contentController.text;
       });
 
@@ -51,7 +54,7 @@ class _EditStickyPageState extends State<EditStickyPage> {
   }
 
   void _saveSticky() async {
-    if (!_validateData()) {
+    if (!_isDirty) {
       Navigator.pop(context);
       return;
     }
@@ -68,14 +71,6 @@ class _EditStickyPageState extends State<EditStickyPage> {
     await stickyProvider.close();
 
     Navigator.pop(context);
-  }
-
-  bool _validateData() {
-    if (isEmpty(_titleController.text) && isEmpty(_contentController.text)) {
-      return false;
-    }
-
-    return true;
   }
 
   Future _createSticky(StickyProvider stickyProvider) {

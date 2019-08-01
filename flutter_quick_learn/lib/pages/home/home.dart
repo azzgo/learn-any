@@ -15,7 +15,28 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
-  Iterable<Sticky> stickies;
+  List<Sticky> _stickies;
+
+  List<StickyWithChecked> _mupltipleStickies;
+
+  bool _isMutipleMode = false;
+
+  bool get isMultipleMode {
+    return this._isMutipleMode;
+  }
+
+  void set isMultipleMode(bool val) {
+    if (val && !this._isMutipleMode) {
+      _mupltipleStickies = _stickies
+          .map((item) => StickyWithChecked(sticky: item, checked: false))
+          .toList();
+    }
+
+    if (!val) {
+      _mupltipleStickies =  null;
+    }
+    this._isMutipleMode = val;
+  }
 
   @override
   void initState() {
@@ -28,7 +49,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     await stickyProvider.open();
     var stickies = await stickyProvider.getStickies();
     this.setState(() {
-      this.stickies = stickies;
+      this._stickies = stickies.toList();
     });
     stickyProvider.close();
   }
@@ -44,37 +65,130 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
         context, MaterialPageRoute(builder: (context) => SearchPage()));
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
+  void _enterMultipleMode() {
+    setState(() {
+      isMultipleMode = true;
+    });
+  }
+
+  AppBar _getAppBar() {
+    if (isMultipleMode) {
+      return AppBar(
+        leading: IconButton(
+            icon: Icon(Icons.close),
+            onPressed: () {
+              setState(() {
+                isMultipleMode = false;
+              });
+            }),
+        actions: <Widget>[
+          IconButton(
+            icon: Icon(Icons.delete),
+            onPressed: () async {
+              StickyProvider stickyProvider = StickyProvider();
+              await stickyProvider.open();
+              _mupltipleStickies.where((item) => item.checked).forEach((item) {
+                stickyProvider.deleteSticky(item.sticky.id);
+              });
+
+              await stickyProvider.close();
+
+              this.isMultipleMode = false;
+
+              this.initStickiesData();
+
+            },
+          ),
+          IconButton(
+              icon: Icon(
+                Icons.check_box,
+                color: Colors.white,
+              ),
+              onPressed: () {
+                if (_mupltipleStickies.every((item) => item.checked)) {
+                  _mupltipleStickies.forEach((item) {
+                    item.checked = false;
+                  });
+                } else {
+                  _mupltipleStickies.forEach((item) {
+                    item.checked = true;
+                  });
+                }
+                this.setState(() {});
+              })
+        ],
+      );
+    } else {
+      return AppBar(
         title: Text(widget.title),
         actions: <Widget>[
           IconButton(
               icon: Icon(Icons.search, color: Colors.brown[200]),
               onPressed: navigateToSearchPage),
         ],
-      ),
-      body: ListView.builder(
+      );
+    }
+  }
+
+  ListView _getListView() {
+    if (isMultipleMode) {
+      return ListView.builder(
         itemBuilder: (context, index) {
-          var sticky = stickies.toList()[index];
+          var stickyWithChecked = _mupltipleStickies[index];
+          var sticky = stickyWithChecked.sticky;
+          return GestureDetector(
+              onTap: () => {
+                    setState(() {
+                      stickyWithChecked.checked = !stickyWithChecked.checked;
+                    })
+                  },
+              child: Row(children: <Widget>[
+                Icon(stickyWithChecked.checked
+                    ? Icons.check_box
+                    : Icons.check_box_outline_blank),
+                Expanded(
+                  child: StickyItem(
+                      sticky.title, sticky.content, sticky.modifyTime),
+                )
+              ]));
+        },
+        itemExtent: 130,
+        itemCount: _mupltipleStickies?.length ?? 0,
+      );
+    } else {
+      return ListView.builder(
+        itemBuilder: (context, index) {
+          var sticky = _stickies[index];
           return GestureDetector(
               onTap: () => navigateToEditPage(id: sticky.id),
-              onLongPressEnd: (longPressDetails) {
-                print(longPressDetails);
-              },
+              onLongPress: _enterMultipleMode,
               child:
                   StickyItem(sticky.title, sticky.content, sticky.modifyTime));
         },
         itemExtent: 130,
-        itemCount: stickies?.length ?? 0,
-      ),
+        itemCount: _stickies?.length ?? 0,
+      );
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: _getAppBar(),
+      body: _getListView(),
       floatingActionButton: FloatingActionButton(
         backgroundColor: Colors.brown,
-        tooltip: 'Increment',
+        tooltip: '增加便签',
         child: Icon(Icons.add),
         onPressed: navigateToEditPage,
       ),
     );
   }
+}
+
+class StickyWithChecked {
+  Sticky sticky;
+  bool checked;
+
+  StickyWithChecked({this.sticky, this.checked});
 }
