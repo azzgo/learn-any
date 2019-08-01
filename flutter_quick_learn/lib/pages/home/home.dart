@@ -175,12 +175,12 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     return Scaffold(
       appBar: isMultipleMode? _getCheckableListViewAppBar() : _getAppBar(),
       body: isMultipleMode ? _getCheckableListView() : _getListView(),
-      floatingActionButton: FloatingActionButton(
+      floatingActionButton: !isMultipleMode ? FloatingActionButton(
         backgroundColor: Colors.brown,
         tooltip: '增加便签',
         child: Icon(Icons.add),
         onPressed: navigateToEditPage,
-      ),
+      ) : null,
     );
   }
 }
