@@ -1,0 +1,11 @@
+package models
+
+type UserModel struct {
+	User struct {
+		Email    string `json: "email"`
+		Token    string `json: "token"`
+		Username string `json: "username"`
+		Bio      string `json: "bio"`
+		Image    string `json: "image"`
+	} `json: "user"`
+}

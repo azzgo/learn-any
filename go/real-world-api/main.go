@@ -1,10 +1,16 @@
 package main
 
-import "github.com/gin-gonic/gin"
+import (
+	"fmt"
+	"real-world-api/src/users"
+	"github.com/gin-gonic/gin"
+)
 
 func main() {
 	r := gin.Default()
 	api := r.Group("/api")
+
+	users.UseUsersEndpoints(api.Group("/users"))
 
 	// health check
 	api.GET("/ping", func(c *gin.Context) {
@@ -13,5 +19,6 @@ func main() {
 		})
 	})
 
-	r.Run() // listen and serve on 0.0.0.0:8080
+	r.Run()
+	fmt.Println("listen and serve on http://127.0.0.1:8080")
 }
