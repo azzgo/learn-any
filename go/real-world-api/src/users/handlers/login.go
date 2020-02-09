@@ -14,6 +14,11 @@ type LoginForm struct {
 	} `form: 'user'`
 }
 
+// Login godoc
+// @Accept  json
+// @Produce  json
+// @Produce  json
+// @Router /users/login [post]
 func Login(c *gin.Context) {
 	var form LoginForm
 	if c.ShouldBindJSON(&form) == nil {

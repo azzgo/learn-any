@@ -15,6 +15,10 @@ type RegisterForm struct {
 	} `form: "user"`
 }
 
+// Register godoc
+// @Accept  json
+// @Produce  json
+// @Router /users/register [post]
 func Register(c *gin.Context) {
 	var registerForm RegisterForm
 	c.ShouldBindJSON(&registerForm)
