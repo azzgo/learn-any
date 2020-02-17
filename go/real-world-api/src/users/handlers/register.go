@@ -12,15 +12,18 @@ import (
 // RegisterForm godoc
 type RegisterForm struct {
 	User struct {
-		Username string `form:"username" binding:"required"`
-		Email    string `form:"email" binding:"required"`
-		Password string `form:"password" binding:"required,gte=8"`
+		Username string `form:"username" binding:"required" example:"jojo"`
+		Email    string `form:"email" binding:"required" example:"jojo@jojo.io"`
+		Password string `form:"password" binding:"required,gte=8" example:"jojojojo"`
 	} `form:"user"`
 }
 
 // Register godoc
+// @tags Users
 // @Accept  json
 // @Produce  json
+// @param User body handlers.RegisterForm true "User"
+// @Success 200 {object} handlers.UserSchema "answer"
 // @Router /users/register [post]
 func Register(c *gin.Context) {
 	var registerForm RegisterForm
@@ -29,7 +32,7 @@ func Register(c *gin.Context) {
 		return
 	}
 
-	if user, _ := UserModel.GetUserByEmail(registerForm.User.Email); user != nil {
+	if user, _ := UserModel.GetUserByEmail(registerForm.User.Email); *user != (UserModel.UserModel{}) {
 		c.AbortWithStatusJSON(http.StatusUnprocessableEntity, common.GenErrorJSON(common.ErrUserAlreadyExists))
 		return
 	}

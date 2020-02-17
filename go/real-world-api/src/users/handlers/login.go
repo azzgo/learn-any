@@ -12,15 +12,18 @@ import (
 // LoginForm godoc
 type LoginForm struct {
 	User struct {
-		Email    string `form:"email"`
-		Password string `form:"password"`
+		Email    string `form:"email" example:"jojo@jojo.io"`
+		Password string `form:"password" example:"jojojojo"`
 	} `form:"user"`
 }
 
 // Login godoc
+// @tags Users
 // @Accept  json
 // @Produce  json
 // @Produce  json
+// @param User body handlers.LoginForm true "User"
+// @Success 200 {object} handlers.UserSchema "answer"
 // @Router /users/login [post]
 func Login(c *gin.Context) {
 	var form LoginForm

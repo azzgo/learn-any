@@ -41,7 +41,7 @@ func CreateUser(email string, username string, password string) (*UserModel, err
 // GetUserByEmail godoc
 func GetUserByEmail(email string) (*UserModel, error) {
 	db := db.GetDB()
-	user := UserModel{}
-	err := db.Where("email=?", email).First(&user).Error
-	return &user, err
+	user := new(UserModel)
+	err := db.Where("email=?", email).First(user).Error
+	return user, err
 }

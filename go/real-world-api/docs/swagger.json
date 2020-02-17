@@ -16,7 +16,29 @@
                 "produces": [
                     "application/json",
                     "application/json"
-                ]
+                ],
+                "tags": [
+                    "Users"
+                ],
+                "parameters": [
+                    {
+                        "description": "User",
+                        "name": "User",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/handlers.LoginForm"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "answer",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.UserSchema"
+                        }
+                    }
+                }
             }
         },
         "/users/register": {
@@ -26,7 +48,96 @@
                 ],
                 "produces": [
                     "application/json"
-                ]
+                ],
+                "tags": [
+                    "Users"
+                ],
+                "parameters": [
+                    {
+                        "description": "User",
+                        "name": "User",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/handlers.RegisterForm"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "answer",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.UserSchema"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "handlers.LoginForm": {
+            "type": "object",
+            "properties": {
+                "user": {
+                    "type": "object",
+                    "properties": {
+                        "email": {
+                            "type": "string",
+                            "example": "jojo@jojo.io"
+                        },
+                        "password": {
+                            "type": "string",
+                            "example": "jojojojo"
+                        }
+                    }
+                }
+            }
+        },
+        "handlers.RegisterForm": {
+            "type": "object",
+            "required": [
+                "email",
+                "password",
+                "username"
+            ],
+            "properties": {
+                "user": {
+                    "type": "object",
+                    "properties": {
+                        "email": {
+                            "type": "string",
+                            "example": "jojo@jojo.io"
+                        },
+                        "password": {
+                            "type": "string",
+                            "example": "jojojojo"
+                        },
+                        "username": {
+                            "type": "string",
+                            "example": "jojo"
+                        }
+                    }
+                }
+            }
+        },
+        "handlers.UserSchema": {
+            "type": "object",
+            "properties": {
+                "bio": {
+                    "type": "string"
+                },
+                "email": {
+                    "type": "string"
+                },
+                "image": {
+                    "type": "string"
+                },
+                "token": {
+                    "type": "string"
+                },
+                "username": {
+                    "type": "string"
+                }
             }
         }
     }

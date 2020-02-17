@@ -1,4 +1,49 @@
 basePath: /api
+definitions:
+  handlers.LoginForm:
+    properties:
+      user:
+        properties:
+          email:
+            example: jojo@jojo.io
+            type: string
+          password:
+            example: jojojojo
+            type: string
+        type: object
+    type: object
+  handlers.RegisterForm:
+    properties:
+      user:
+        properties:
+          email:
+            example: jojo@jojo.io
+            type: string
+          password:
+            example: jojojojo
+            type: string
+          username:
+            example: jojo
+            type: string
+        type: object
+    required:
+    - email
+    - password
+    - username
+    type: object
+  handlers.UserSchema:
+    properties:
+      bio:
+        type: string
+      email:
+        type: string
+      image:
+        type: string
+      token:
+        type: string
+      username:
+        type: string
+    type: object
 info:
   contact: {}
   license: {}
@@ -9,13 +54,41 @@ paths:
     post:
       consumes:
       - application/json
+      parameters:
+      - description: User
+        in: body
+        name: User
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.LoginForm'
       produces:
       - application/json
       - application/json
+      responses:
+        "200":
+          description: answer
+          schema:
+            $ref: '#/definitions/handlers.UserSchema'
+      tags:
+      - Users
   /users/register:
     post:
       consumes:
       - application/json
+      parameters:
+      - description: User
+        in: body
+        name: User
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.RegisterForm'
       produces:
       - application/json
+      responses:
+        "200":
+          description: answer
+          schema:
+            $ref: '#/definitions/handlers.UserSchema'
+      tags:
+      - Users
 swagger: "2.0"
