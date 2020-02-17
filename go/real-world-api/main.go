@@ -28,8 +28,8 @@ func main() {
 	}
 	common.InitConfig()
 
-	r := gin.Default()
-	r.Use(middlewares.HandleSeverErrors())
+	r := gin.New()
+	r.Use(gin.Logger(), middlewares.HandleServerErrors())
 
 	api := r.Group("/api")
 
@@ -50,6 +50,6 @@ func main() {
 	url := ginSwagger.URL("http://localhost:8080/swagger/doc.json")
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler, url))
 
-	r.Run()
+	r.Run("localhost:8080")
 	log.Println("listen and serve on http://127.0.0.1:8080")
 }

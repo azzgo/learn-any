@@ -6,6 +6,7 @@ import (
 	"github.com/jinzhu/gorm"
 )
 
+
 func openDB() (*gorm.DB, error) {
 	var USERNAME = common.Config["MYSQL_USERNAME"]
 	var PASSWORD = common.Config["MYSQL_PASSWORD"]

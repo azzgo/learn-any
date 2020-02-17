@@ -1,12 +1,13 @@
 package handlers
 
 import (
-	"log"
 	"net/http"
 	"real-world-api/src/common"
+	"real-world-api/src/errorcodes"
 	UserModel "real-world-api/src/users/models"
 
 	"github.com/gin-gonic/gin"
+	"github.com/jinzhu/gorm"
 )
 
 // LoginForm godoc
@@ -25,25 +26,24 @@ type LoginForm struct {
 func Login(c *gin.Context) {
 	var form LoginForm
 	if err := c.ShouldBindJSON(&form); err != nil {
-		log.Println(form.User.Email)
-		log.Println(form.User.Password)
-		c.AbortWithError(http.StatusBadRequest, err)
+		c.AbortWithStatusJSON(http.StatusUnprocessableEntity, common.GenErrorJSON("Email Or Password Are Required"))
 		return
 	}
 
 	userModel, err := UserModel.GetUserByEmail(form.User.Email)
 
 	if err != nil {
-		if err.Error() == "record not found" {
-			c.AbortWithError(http.StatusBadRequest, err)
+		if err == gorm.ErrRecordNotFound {
+			c.AbortWithStatusJSON(http.StatusUnprocessableEntity, common.GenErrorJSON(errorcodes.UserNotExist))
 			return
 		}
 
-		c.Error(err).SetType(gin.ErrorTypePrivate)
+		panic(err)
 	}
 
 	if !checkPassword(form.User.Password, userModel.Password) {
-		c.AbortWithError(http.StatusBadRequest, err)
+		c.AbortWithStatusJSON(http.StatusUnprocessableEntity, common.GenErrorJSON(errorcodes.NoCorrectPassword))
+		return
 	}
 
 	genLoginResponse(c, userModel)
@@ -58,8 +58,7 @@ func genLoginResponse(c *gin.Context, userModel *UserModel.UserModel) {
 
 	tokenString, err := common.JWTSign()
 	if err != nil {
-
-		c.Error(err).SetType(gin.ErrorTypePrivate)
+		c.Error(err).SetType(gin.ErrorTypePublic)
 	} else {
 		user.Token = tokenString
 		c.JSON(http.StatusOK, gin.H{"user": user})

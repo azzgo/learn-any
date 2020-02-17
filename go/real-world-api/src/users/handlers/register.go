@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"real-world-api/src/common"
+	"real-world-api/src/errorcodes"
 	UserModel "real-world-api/src/users/models"
 
 	"github.com/gin-gonic/gin"
@@ -25,13 +26,15 @@ type RegisterForm struct {
 func Register(c *gin.Context) {
 	var registerForm RegisterForm
 	if err := c.ShouldBindJSON(&registerForm); err != nil {
-		c.AbortWithError(http.StatusBadGateway, err)
+		c.AbortWithStatusJSON(http.StatusUnprocessableEntity, common.GenErrorJSON("Email, UserName, Password are required"))
 		return
 	}
 
 	if user, _ := UserModel.GetUserByEmail(registerForm.User.Email); user != nil {
-		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": "用户已存在"})
+		c.AbortWithStatusJSON(http.StatusUnprocessableEntity, common.GenErrorJSON(errorcodes.UserAlreadyExists))
+		return
 	}
+
 	userModel, err := UserModel.CreateUser(
 		registerForm.User.Email,
 		registerForm.User.Username,
@@ -39,7 +42,7 @@ func Register(c *gin.Context) {
 	)
 
 	if err != nil {
-		c.Error(err).SetType(gin.ErrorTypePrivate)
+		panic(err)
 	}
 
 	genRegisterResponse(c, userModel)
@@ -53,7 +56,7 @@ func genRegisterResponse(c *gin.Context, userModel *UserModel.UserModel) {
 	user.Image = userModel.Image
 	tokenString, err := common.JWTSign()
 	if err != nil {
-		c.Error(err).SetType(gin.ErrorTypePrivate)
+		c.Error(err).SetType(gin.ErrorTypePublic)
 	} else {
 		user.Token = tokenString
 		c.JSON(http.StatusCreated, gin.H{

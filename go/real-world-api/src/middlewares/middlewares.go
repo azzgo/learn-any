@@ -7,17 +7,15 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// HandleSeverErrors godoc
-func HandleSeverErrors() gin.HandlerFunc{
+// HandleServerErrors godoc
+func HandleServerErrors() gin.HandlerFunc {
 	return func(c *gin.Context) {
+		defer func() {
+			if err := recover(); err != nil {
+				log.Println("Internal Error: ", err)
+				c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "Server Internal Error"})
+			}
+		}()
 		c.Next()
-
-		privateErrs := c.Errors.ByType(gin.ErrorTypePrivate)
-		if len(privateErrs) != 0 {
-			log.Fatal(privateErrs.Last().Error())
-			c.JSON(http.StatusInternalServerError, gin.H{
-				"error": "server internal serror",
-			})
-		}
 	}
 }
