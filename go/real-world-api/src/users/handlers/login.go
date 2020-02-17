@@ -3,7 +3,6 @@ package handlers
 import (
 	"net/http"
 	"real-world-api/src/common"
-	"real-world-api/src/errorcodes"
 	UserModel "real-world-api/src/users/models"
 
 	"github.com/gin-gonic/gin"
@@ -34,7 +33,7 @@ func Login(c *gin.Context) {
 
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
-			c.AbortWithStatusJSON(http.StatusUnprocessableEntity, common.GenErrorJSON(errorcodes.UserNotExist))
+			c.AbortWithStatusJSON(http.StatusUnprocessableEntity, common.GenErrorJSON(common.ErrUserNotExist))
 			return
 		}
 
@@ -42,7 +41,7 @@ func Login(c *gin.Context) {
 	}
 
 	if !checkPassword(form.User.Password, userModel.Password) {
-		c.AbortWithStatusJSON(http.StatusUnprocessableEntity, common.GenErrorJSON(errorcodes.NoCorrectPassword))
+		c.AbortWithStatusJSON(http.StatusUnprocessableEntity, common.GenErrorJSON(common.ErrNoCorrectPassword))
 		return
 	}
 

@@ -4,7 +4,6 @@ import (
 	"net/http"
 
 	"real-world-api/src/common"
-	"real-world-api/src/errorcodes"
 	UserModel "real-world-api/src/users/models"
 
 	"github.com/gin-gonic/gin"
@@ -31,7 +30,7 @@ func Register(c *gin.Context) {
 	}
 
 	if user, _ := UserModel.GetUserByEmail(registerForm.User.Email); user != nil {
-		c.AbortWithStatusJSON(http.StatusUnprocessableEntity, common.GenErrorJSON(errorcodes.UserAlreadyExists))
+		c.AbortWithStatusJSON(http.StatusUnprocessableEntity, common.GenErrorJSON(common.ErrUserAlreadyExists))
 		return
 	}
 
