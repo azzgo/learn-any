@@ -27,43 +27,41 @@ func Login(c *gin.Context) {
 	if err := c.ShouldBindJSON(&form); err != nil {
 		log.Println(form.User.Email)
 		log.Println(form.User.Password)
-		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
-			"error": "bad request",
-		})
+		c.AbortWithError(http.StatusBadRequest, err)
 		return
 	}
 
-	user, err := UserModel.GetUserByEmail(form.User.Email)
+	userModel, err := UserModel.GetUserByEmail(form.User.Email)
 
 	if err != nil {
 		if err.Error() == "record not found" {
-			c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
-				"error": "user not exists",
-			})
+			c.AbortWithError(http.StatusBadRequest, err)
 			return
 		}
 
-		c.AbortWithError(http.StatusInternalServerError, err)
-		return
+		c.Error(err).SetType(gin.ErrorTypePrivate)
 	}
 
-	if common.Hash(form.User.Password) != user.Password {
+	if !checkPassword(form.User.Password, userModel.Password) {
 		c.AbortWithError(http.StatusBadRequest, err)
 	}
 
-	var resUser = new(UserSchema)
-	resUser.Email = user.Email
-	resUser.Username = user.Username
+	genLoginResponse(c, userModel)
+}
+
+func genLoginResponse(c *gin.Context, userModel *UserModel.UserModel) {
+	var user = new(UserSchema)
+	user.Email = userModel.Email
+	user.Username = userModel.Username
+	user.Bio = userModel.Bio
+	user.Image = userModel.Image
+
 	tokenString, err := common.JWTSign()
-
 	if err != nil {
-		c.AbortWithError(http.StatusInternalServerError, err)
-		return
-	}
-	resUser.Token = tokenString
-	resUser.Bio = user.Bio
-	resUser.Image = user.Image
 
-	c.JSON(http.StatusOK, gin.H{"user": resUser})
-	return
+		c.Error(err).SetType(gin.ErrorTypePrivate)
+	} else {
+		user.Token = tokenString
+		c.JSON(http.StatusOK, gin.H{"user": user})
+	}
 }

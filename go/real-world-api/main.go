@@ -4,6 +4,7 @@ import (
 	"log"
 	"real-world-api/src/common"
 	"real-world-api/src/db"
+	"real-world-api/src/middlewares"
 	"real-world-api/src/users"
 	userModels "real-world-api/src/users/models"
 
@@ -28,6 +29,7 @@ func main() {
 	common.InitConfig()
 
 	r := gin.Default()
+	r.Use(middlewares.HandleSeverErrors())
 
 	api := r.Group("/api")
 

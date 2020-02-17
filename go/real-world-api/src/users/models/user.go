@@ -17,27 +17,25 @@ type UserModel struct {
 	Image    string
 }
 
-// New godoc
-func New() *UserModel {
-	var user = new(UserModel)
-	return user
-}
-
 // TableName godoc
 func (UserModel) TableName() string {
   return "users"
 }
 
 // SetPassword godoc
-func (user *UserModel) SetPassword(password string) {
-	user.Password = common.Hash(password)
+func (u *UserModel) SetPassword(password string) {
+	u.Password = common.Hash(password)
 }
 
 // CreateUser godoc
-func CreateUser(userModel *UserModel) error {
+func CreateUser(email string, username string, password string) (*UserModel, error) {
+	user := new(UserModel)
+	user.Email = email
+	user.Username = username
+	user.SetPassword(password)
 	db := db.GetDB()
-	err := db.Create(userModel).Error
-	return err
+	err := db.Create(user).Error
+	return user, err
 }
 
 // GetUserByEmail godoc
