@@ -2,6 +2,7 @@ package middlewares
 
 import (
 	"log"
+	"net/http"
 
 	"github.com/gin-gonic/gin"
 )
@@ -14,7 +15,7 @@ func HandleSeverErrors() gin.HandlerFunc{
 		privateErrs := c.Errors.ByType(gin.ErrorTypePrivate)
 		if len(privateErrs) != 0 {
 			log.Fatal(privateErrs.Last().Error())
-			c.JSON(500, gin.H{
+			c.JSON(http.StatusInternalServerError, gin.H{
 				"error": "server internal serror",
 			})
 		}
