@@ -49,7 +49,7 @@ func JWTAuth() gin.HandlerFunc {
 			}
 		}
 
-		c.AbortWithStatusJSON(http.StatusUnauthorized, common.GenErrorJSON(common.ErrUnauthorized))
+		c.AbortWithStatusJSON(http.StatusForbidden, common.GenErrorJSON(common.ErrUnauthorized))
 		
 	}
 }
