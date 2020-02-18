@@ -2,11 +2,13 @@ package main
 
 import (
 	"log"
+	"real-world-api/src/apis"
 	"real-world-api/src/common"
 	"real-world-api/src/db"
 	"real-world-api/src/middlewares"
-	"real-world-api/src/users"
 	userModels "real-world-api/src/users/models"
+
+	"github.com/gin-contrib/cors"
 
 	_ "real-world-api/docs"
 
@@ -29,7 +31,11 @@ func main() {
 	common.InitConfig()
 
 	r := gin.New()
-	r.Use(gin.Logger(), middlewares.HandleServerErrors())
+
+	config := cors.DefaultConfig()
+	config.AllowOrigins = []string{"http://localhost:4100"}
+
+	r.Use(gin.Logger(), middlewares.HandleServerErrors(), cors.New(config))
 
 	api := r.Group("/api")
 
@@ -37,7 +43,8 @@ func main() {
 	db.AutoMigrate(&userModels.UserModel{})
 	defer db.Close()
 
-	users.UseUsersEndpoints(api.Group("/users"))
+	// Configure Endpoints
+	apis.UseUsersEndpoints(api)
 
 	// Health check
 	api.GET("/ping", func(c *gin.Context) {
@@ -47,9 +54,8 @@ func main() {
 	})
 
 	// Swagger Configuration
-	url := ginSwagger.URL("http://localhost:8080/swagger/doc.json")
+	url := ginSwagger.URL("http://localhost:3000/swagger/doc.json")
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler, url))
 
-	r.Run("localhost:8080")
-	log.Println("listen and serve on http://127.0.0.1:8080")
+	r.Run("localhost:3000")
 }
