@@ -9,6 +9,12 @@ import (
 )
 
 // Profile godoc
+// @tags Users
+// @Accept  json
+// @Produce  json
+// @Param username path string true "username"
+// @Success 200 {object} handlers.ProfileSchema "answer"
+// @Router /user/{username} [get]
 func Profile(c *gin.Context) {
 	username := c.Param("username")
 	if userModel, _ := userModels.GetUserByUsername(username); *userModel == (userModels.UserModel{}) {

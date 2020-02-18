@@ -12,7 +12,8 @@ import (
 // @tags Users
 // @Accept  json
 // @Produce  json
-// @Produce  json
+// @Param Authorization header string true "Authentication header"
+// @Success 200 {object} handlers.UserSchema "answer"
 // @Router /user [get]
 func CurrentUser(c *gin.Context) {
 	value, _ := c.Get(common.KeyJwtCurentUser)

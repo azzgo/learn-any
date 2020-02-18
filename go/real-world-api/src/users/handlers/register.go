@@ -23,7 +23,7 @@ type RegisterForm struct {
 // @Accept  json
 // @Produce  json
 // @param User body handlers.RegisterForm true "User"
-// @Success 200 {object} handlers.UserSchema "answer"
+// @Success 200 {object} handlers.UserWithTokenSchema "answer"
 // @Router /users/register [post]
 func Register(c *gin.Context) {
 	var registerForm RegisterForm

@@ -12,6 +12,17 @@ definitions:
             type: string
         type: object
     type: object
+  handlers.ProfileSchema:
+    properties:
+      bio:
+        type: string
+      following:
+        type: boolean
+      image:
+        type: string
+      username:
+        type: string
+    type: object
   handlers.RegisterForm:
     properties:
       user:
@@ -39,6 +50,17 @@ definitions:
         type: string
       image:
         type: string
+      username:
+        type: string
+    type: object
+  handlers.UserWithTokenSchema:
+    properties:
+      bio:
+        type: string
+      email:
+        type: string
+      image:
+        type: string
       token:
         type: string
       username:
@@ -50,6 +72,44 @@ info:
   title: Swagger Example API
   version: "1.0"
 paths:
+  /user:
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: Authentication header
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: answer
+          schema:
+            $ref: '#/definitions/handlers.UserSchema'
+      tags:
+      - Users
+  /user/{username}:
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: username
+        in: path
+        name: username
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: answer
+          schema:
+            $ref: '#/definitions/handlers.ProfileSchema'
+      tags:
+      - Users
   /users/login:
     post:
       consumes:
@@ -68,7 +128,7 @@ paths:
         "200":
           description: answer
           schema:
-            $ref: '#/definitions/handlers.UserSchema'
+            $ref: '#/definitions/handlers.UserWithTokenSchema'
       tags:
       - Users
   /users/register:
@@ -88,7 +148,7 @@ paths:
         "200":
           description: answer
           schema:
-            $ref: '#/definitions/handlers.UserSchema'
+            $ref: '#/definitions/handlers.UserWithTokenSchema'
       tags:
       - Users
 swagger: "2.0"

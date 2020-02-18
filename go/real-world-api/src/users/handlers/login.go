@@ -23,7 +23,7 @@ type LoginForm struct {
 // @Produce  json
 // @Produce  json
 // @param User body handlers.LoginForm true "User"
-// @Success 200 {object} handlers.UserSchema "answer"
+// @Success 200 {object} handlers.UserWithTokenSchema "answer"
 // @Router /users/login [post]
 func Login(c *gin.Context) {
 	var form LoginForm
