@@ -54,7 +54,7 @@ func main() {
 	})
 
 	// Swagger Configuration
-	url := ginSwagger.URL("http://localhost:3000/swagger/doc.json")
+	url := ginSwagger.URL("/swagger/doc.json")
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler, url))
 
 	r.Run("localhost:3000")
