@@ -45,3 +45,11 @@ func GetUserByEmail(email string) (*UserModel, error) {
 	err := db.Where("email=?", email).First(user).Error
 	return user, err
 }
+
+// GetUserByID godoc
+func GetUserByID(id uint) (*UserModel, error) {
+	db := db.GetDB()
+	user := new(UserModel)
+	err := db.Where("id=?", id).First(user).Error
+	return user, err
+}

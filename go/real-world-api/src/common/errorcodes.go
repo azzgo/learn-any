@@ -8,4 +8,6 @@ const (
 	ErrUserNotExist = "User Not Exist"
 	// ErrUserAlreadyExists 用户已存在
 	ErrUserAlreadyExists = "User Already Exists"
+	// ErrUnauthorized 未授权
+	ErrUnauthorized = "Unauthorized"
 )

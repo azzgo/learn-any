@@ -4,7 +4,7 @@ import (
 	"net/http"
 
 	"real-world-api/src/common"
-	UserModel "real-world-api/src/users/models"
+	userModels "real-world-api/src/users/models"
 
 	"github.com/gin-gonic/gin"
 )
@@ -32,12 +32,12 @@ func Register(c *gin.Context) {
 		return
 	}
 
-	if user, _ := UserModel.GetUserByEmail(registerForm.User.Email); *user != (UserModel.UserModel{}) {
+	if user, _ := userModels.GetUserByEmail(registerForm.User.Email); *user != (userModels.UserModel{}) {
 		c.AbortWithStatusJSON(http.StatusUnprocessableEntity, common.GenErrorJSON(common.ErrUserAlreadyExists))
 		return
 	}
 
-	userModel, err := UserModel.CreateUser(
+	userModel, err := userModels.CreateUser(
 		registerForm.User.Email,
 		registerForm.User.Username,
 		registerForm.User.Password,
@@ -50,15 +50,15 @@ func Register(c *gin.Context) {
 	genRegisterResponse(c, userModel)
 }
 
-func genRegisterResponse(c *gin.Context, userModel *UserModel.UserModel) {
-	var user = new(UserSchema)
+func genRegisterResponse(c *gin.Context, userModel *userModels.UserModel) {
+	var user = new(UserWithTokenSchema)
 	user.Email = userModel.Email
 	user.Username = userModel.Username
 	user.Bio = userModel.Bio
 	user.Image = userModel.Image
-	tokenString, err := common.JWTSign()
+	tokenString, err := getSignWishUserID(userModel.ID)
 	if err != nil {
-		c.Error(err).SetType(gin.ErrorTypePublic)
+		panic(err)
 	} else {
 		user.Token = tokenString
 		c.JSON(http.StatusCreated, gin.H{

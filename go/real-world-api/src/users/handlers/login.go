@@ -3,7 +3,7 @@ package handlers
 import (
 	"net/http"
 	"real-world-api/src/common"
-	UserModel "real-world-api/src/users/models"
+	userModels "real-world-api/src/users/models"
 
 	"github.com/gin-gonic/gin"
 	"github.com/jinzhu/gorm"
@@ -32,7 +32,7 @@ func Login(c *gin.Context) {
 		return
 	}
 
-	userModel, err := UserModel.GetUserByEmail(form.User.Email)
+	userModel, err := userModels.GetUserByEmail(form.User.Email)
 
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
@@ -51,16 +51,16 @@ func Login(c *gin.Context) {
 	genLoginResponse(c, userModel)
 }
 
-func genLoginResponse(c *gin.Context, userModel *UserModel.UserModel) {
-	var user = new(UserSchema)
+func genLoginResponse(c *gin.Context, userModel *userModels.UserModel) {
+	var user = new(UserWithTokenSchema)
 	user.Email = userModel.Email
 	user.Username = userModel.Username
 	user.Bio = userModel.Bio
 	user.Image = userModel.Image
 
-	tokenString, err := common.JWTSign()
+	tokenString, err := getSignWishUserID(userModel.ID)
 	if err != nil {
-		c.Error(err).SetType(gin.ErrorTypePublic)
+		panic(err)
 	} else {
 		user.Token = tokenString
 		c.JSON(http.StatusOK, gin.H{"user": user})
