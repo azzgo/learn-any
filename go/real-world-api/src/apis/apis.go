@@ -18,5 +18,7 @@ func UseUsersEndpoints(api *gin.RouterGroup) {
 
 	// user
 	api.GET("/user",authRequireLoginMiddleware, userHandlers.CurrentUser)
+	api.POST("/profiles/:username/follow", authRequireLoginMiddleware, userHandlers.Follow)
+	api.DELETE("/profiles/:username/follow", authRequireLoginMiddleware, userHandlers.UnFollow)
 	api.GET("/profiles/:username", authNoNeedLoginMiddleware, userHandlers.Profile)
 }

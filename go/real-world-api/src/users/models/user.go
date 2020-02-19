@@ -10,8 +10,8 @@ import (
 // UserModel godoc
 type UserModel struct {
 	gorm.Model
-	Email    string `gorm:"UNIQUE_INDEX;NOT NULL"`
-	Username string `gorm:"UNIQUE_INDEX;NOT NULL"`
+	Email    string `gorm:"UNIQUE;NOT NULL"`
+	Username string `gorm:"UNIQUE;NOT NULL"`
 	Password string `gorm:"NOT NULL"`
 	Bio      string
 	Image    string

@@ -2,9 +2,10 @@ package handlers
 
 import (
 	"real-world-api/src/common"
+	userModels "real-world-api/src/users/models"
 	"time"
 
-	"github.com/dgrijalva/jwt-go"
+	jwt "github.com/dgrijalva/jwt-go"
 )
 
 func checkPassword(pass string, modelPass string) bool {
@@ -13,7 +14,28 @@ func checkPassword(pass string, modelPass string) bool {
 
 func getSignWishUserID(userid uint) (string, error) {
 	return common.JWTSign(jwt.MapClaims{
-		"userid": userid,
+		"userid":   userid,
 		"signtime": time.Now().Unix(),
 	})
+}
+
+func checkFollowing(currentUserModel *userModels.UserModel, username string) bool {
+	isFollowing := false
+	currentUserID := func() uint {
+		if currentUserModel != nil {
+			return currentUserModel.ID
+		}
+		return 0
+	}()
+
+	ids, _ := userModels.GetTargetFollowedIDs(username)
+	if currentUserID != 0 {
+		for _, id := range ids {
+			if id == currentUserID {
+				isFollowing = true
+			}
+		}
+	}
+
+	return isFollowing
 }

@@ -30,16 +30,7 @@ func Profile(c *gin.Context) {
 		profile.Username = userModel.Username
 		profile.Bio = userModel.Bio
 		profile.Image = userModel.Image
-
-		profile.Following = false
-		ids, _ := userModels.GetTargetFollowedIDs(username)
-		if currentUserModel != nil {
-			for _, id := range ids {
-				if id == currentUserModel.ID {
-					profile.Following = true
-				}
-			}
-		}
+		profile.Following = checkFollowing(currentUserModel, username)
 
 		c.JSON(http.StatusOK, gin.H{"profile": profile})
 	}

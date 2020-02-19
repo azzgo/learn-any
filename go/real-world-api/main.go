@@ -40,7 +40,7 @@ func main() {
 	api := r.Group("/api")
 
 	db := db.GetDB()
-	db.AutoMigrate(&userModels.UserModel{}, &userModels.FollowModels{})
+	db.AutoMigrate(&userModels.UserModel{}, &userModels.FollowModel{})
 	defer db.Close()
 
 	// Configure Endpoints
