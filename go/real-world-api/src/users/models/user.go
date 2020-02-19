@@ -19,7 +19,7 @@ type UserModel struct {
 
 // TableName godoc
 func (UserModel) TableName() string {
-  return "users"
+	return "users"
 }
 
 // SetPassword godoc
@@ -46,6 +46,18 @@ func GetUserByEmail(email string) (*UserModel, error) {
 	return user, err
 }
 
+// CheckUserExist godoc
+func CheckUserExist(username string, email string) bool {
+	count := 0
+
+	db.GetDB().Model(UserModel{
+		Email:    email,
+		Username: username,
+	}).Count(&count)
+
+	return count != 0
+}
+
 // GetUserByID godoc
 func GetUserByID(id uint) (*UserModel, error) {
 	db := db.GetDB()
@@ -55,7 +67,7 @@ func GetUserByID(id uint) (*UserModel, error) {
 }
 
 // GetUserByUsername godoc
-func GetUserByUsername(username string) (*UserModel, error)  {
+func GetUserByUsername(username string) (*UserModel, error) {
 	db := db.GetDB()
 	user := new(UserModel)
 	err := db.Where("username=?", username).First(user).Error

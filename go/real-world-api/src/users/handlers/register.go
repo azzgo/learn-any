@@ -32,7 +32,7 @@ func Register(c *gin.Context) {
 		return
 	}
 
-	if user, _ := userModels.GetUserByEmail(registerForm.User.Email); *user != (userModels.UserModel{}) {
+	if userModels.CheckUserExist(registerForm.User.Username, registerForm.User.Email) {
 		c.AbortWithStatusJSON(http.StatusUnprocessableEntity, common.GenErrorJSON(common.ErrUserAlreadyExists))
 		return
 	}
