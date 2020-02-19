@@ -15,7 +15,6 @@ type UserModel struct {
 	Password string `gorm:"NOT NULL"`
 	Bio      string
 	Image    string
-	Following bool `gorm:"DEFAULT:0"`
 }
 
 // TableName godoc

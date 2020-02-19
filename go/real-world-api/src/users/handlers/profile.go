@@ -14,8 +14,14 @@ import (
 // @Produce  json
 // @Param username path string true "username"
 // @Success 200 {object} handlers.ProfileSchema "answer"
-// @Router /user/{username} [get]
+// @Router /profiles/{username} [get]
 func Profile(c *gin.Context) {
+	value, _ := c.Get(common.KeyJwtCurentUser)
+	var currentUserModel *userModels.UserModel
+	if value != nil {
+		currentUserModel = value.(*userModels.UserModel)
+	}
+
 	username := c.Param("username")
 	if userModel, _ := userModels.GetUserByUsername(username); *userModel == (userModels.UserModel{}) {
 		c.AbortWithStatusJSON(http.StatusUnprocessableEntity, common.GenErrorJSON(common.ErrUserNotExist))
@@ -24,7 +30,17 @@ func Profile(c *gin.Context) {
 		profile.Username = userModel.Username
 		profile.Bio = userModel.Bio
 		profile.Image = userModel.Image
-		profile.Following = userModel.Following
+
+		profile.Following = false
+		ids, _ := userModels.GetTargetFollowedIDs(username)
+		if currentUserModel != nil {
+			for _, id := range ids {
+				if id == currentUserModel.ID {
+					profile.Following = true
+				}
+			}
+		}
+
 		c.JSON(http.StatusOK, gin.H{"profile": profile})
 	}
 

@@ -28,7 +28,7 @@ func HandleServerErrors() gin.HandlerFunc {
 
 
 // JWTAuth godoc
-func JWTAuth() gin.HandlerFunc {
+func JWTAuth(requireLogin bool) gin.HandlerFunc {
 	headerRegex := regexp.MustCompile(`^Token\s*(.*)$`)
 
 	return func (c *gin.Context)  {
@@ -49,8 +49,11 @@ func JWTAuth() gin.HandlerFunc {
 			}
 		}
 
-		c.AbortWithStatusJSON(http.StatusForbidden, common.GenErrorJSON(common.ErrUnauthorized))
-		
+		if requireLogin {
+			c.AbortWithStatusJSON(http.StatusForbidden, common.GenErrorJSON(common.ErrUnauthorized))
+		} else {
+			c.Next()
+		}
 	}
 }
 

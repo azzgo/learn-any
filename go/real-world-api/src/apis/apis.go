@@ -9,12 +9,14 @@ import (
 
 // UseUsersEndpoints 拦截 /api/users 的请求
 func UseUsersEndpoints(api *gin.RouterGroup) {
-	authMiddleware := middlewares.JWTAuth()
+	authRequireLoginMiddleware := middlewares.JWTAuth(true)
+	authNoNeedLoginMiddleware := middlewares.JWTAuth(false)
+
 	// users
 	api.POST("/users/login", userHandlers.Login)
 	api.POST("/users/", userHandlers.Register)
 
 	// user
-	api.GET("/user",authMiddleware, userHandlers.CurrentUser)
-	api.GET("/user/:username", userHandlers.Profile)
+	api.GET("/user",authRequireLoginMiddleware, userHandlers.CurrentUser)
+	api.GET("/profiles/:username", authNoNeedLoginMiddleware, userHandlers.Profile)
 }
