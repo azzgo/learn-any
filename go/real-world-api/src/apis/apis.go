@@ -1,6 +1,7 @@
 package apis
 
 import (
+	articleHandlers "real-world-api/src/articles/handlers"
 	"real-world-api/src/middlewares"
 	userHandlers "real-world-api/src/users/handlers"
 
@@ -21,4 +22,7 @@ func UseUsersEndpoints(api *gin.RouterGroup) {
 	api.POST("/profiles/:username/follow", authRequireLoginMiddleware, userHandlers.Follow)
 	api.DELETE("/profiles/:username/follow", authRequireLoginMiddleware, userHandlers.UnFollow)
 	api.GET("/profiles/:username", authNoNeedLoginMiddleware, userHandlers.Profile)
+
+	// article
+	api.GET("/articles", authNoNeedLoginMiddleware, articleHandlers.GetArictles)
 }
