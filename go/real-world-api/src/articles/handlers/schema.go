@@ -16,5 +16,5 @@ type ArticleSchema struct {
 	UpdateAt time.Time `json:"updateAt"`
 	Favorited bool `json:"favorited"`
 	FavoritesCount uint `json:"favoritesCount"`
-	author userHanlders.ProfileSchema
+	Author userHanlders.ProfileSchema
 }

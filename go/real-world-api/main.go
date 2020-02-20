@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 	"real-world-api/src/apis"
+	articleModels "real-world-api/src/articles/models"
 	"real-world-api/src/common"
 	"real-world-api/src/db"
 	"real-world-api/src/middlewares"
@@ -40,7 +41,13 @@ func main() {
 	api := r.Group("/api")
 
 	db := db.GetDB()
-	db.AutoMigrate(&userModels.UserModel{}, &userModels.FollowModel{})
+	db.AutoMigrate(
+		&userModels.UserModel{}, 
+		&userModels.FollowModel{},
+		&articleModels.ArticleModel{},
+		&articleModels.TagModel{},
+		&articleModels.AuthorModel{},
+	)
 	defer db.Close()
 
 	// Configure Endpoints
