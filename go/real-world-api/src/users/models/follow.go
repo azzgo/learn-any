@@ -18,19 +18,47 @@ func (FollowModel) TableName() string {
 	return "follow"
 }
 
-// GetTargetFollowedIDs godoc
-func GetTargetFollowedIDs(username string) ([]uint, error) {
+// GetTargetFollowingIDs godoc
+func GetTargetFollowingIDs(username string, userID uint) ([]uint, error) {
 	db := db.GetDB()
 	ids := make([]uint, 0)
+	var userModel = new(UserModel)
 	var err error
 
-	userModel, err := GetUserByUsername(username)
+	if username != "" {
+		userModel.Username = username
+	} else {
+		userModel.ID = userID
+	}
+
+	var followModels = make([]*FollowModel, 0)
+	err = db.Find(userModel).Related(&followModels, "followed_user_id").Error
 	if err != nil {
 		return ids, err
 	}
 
+	for _, followModel := range(followModels) {
+		ids = append(ids, followModel.FollowedUserID)
+	}
+
+	return ids, nil
+}
+
+// GetTargetFollowedIDs godoc
+func GetTargetFollowedIDs(username string, userID uint) ([]uint, error) {
+	db := db.GetDB()
+	ids := make([]uint, 0)
+	var err error
+	var userModel = new(UserModel)
+
+	if username != "" {
+		userModel.Username = username
+	} else {
+		userModel.ID = userID
+	}
+
 	var followModels = make([]*FollowModel, 0)
-	err = db.Model(userModel).Related(&followModels, "user_id").Error
+	err = db.Find(userModel).Related(&followModels, "user_id").Error
 	if err != nil {
 		return ids, err
 	}

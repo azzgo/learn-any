@@ -25,11 +25,33 @@ func (ArticleModel) TableName() string {
 	return "article"
 }
 
-// GetAirticles godoc
-func GetAirticles(tag string, author string, favorited string, limit uint, offset uint) ([]*ArticleModel, error) {
+// FilterAirticles godoc
+func FilterAirticles(tag string, author string, favorited string, limit uint, offset uint) ([]*ArticleModel, error) {
+	return filterAirticlesQuery(nil, tag, author, favorited, limit, offset)
+}
+
+// FilterFollowingAuthorAirticles godoc
+func FilterFollowingAuthorAirticles(curUserID uint, tag string, author string, favorited string, limit uint, offset uint) ([]*ArticleModel, error) {
+	ids, err := userModels.GetTargetFollowingIDs("", curUserID)
+	if err != nil {
+		return nil, err
+	}
+	return filterAirticlesQuery(db.GetDB().Where("author_id in (?)", ids), tag, author, favorited, limit, offset)
+}
+
+
+func filterAirticlesQuery(preQuery *gorm.DB, tag string, author string, favorited string, limit uint, offset uint) ([]*ArticleModel, error) {
 	var articles = make([]*ArticleModel, 0)
 	var ids []uint = make([]uint, 0)
 	var err error
+	
+	// judge use which scope
+	var conn *gorm.DB
+	if preQuery != nil {
+		conn = preQuery
+	} else {
+		conn = db.GetDB()
+	}
 
 	if tag != "" {
 		_ids, _ := GetTagRelatedArticles(tag)
@@ -44,9 +66,9 @@ func GetAirticles(tag string, author string, favorited string, limit uint, offse
 	}
 
 	if tag != "" || author != "" {
-		err = db.GetDB().Where("id in (?)", ids).Offset(offset).Limit(limit).Order("updated_at desc").Find(&articles).Error	
+		err = conn.Where("id in (?)", ids).Offset(offset).Limit(limit).Order("updated_at desc").Find(&articles).Error	
 	} else {
-		err = db.GetDB().Offset(offset).Limit(limit).Order("updated_at desc").Find(&articles).Error	
+		err = conn.Offset(offset).Limit(limit).Order("updated_at desc").Find(&articles).Error	
 	}
 
 	return articles, err

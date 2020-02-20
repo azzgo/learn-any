@@ -28,7 +28,7 @@ func checkFollowing(currentUserModel *userModels.UserModel, username string) boo
 		return 0
 	}()
 
-	ids, _ := userModels.GetTargetFollowedIDs(username)
+	ids, _ := userModels.GetTargetFollowedIDs(username, 0)
 	if currentUserID != 0 {
 		for _, id := range ids {
 			if id == currentUserID {

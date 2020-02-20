@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	articleModels "real-world-api/src/articles/models"
+	"real-world-api/src/common"
 	userHanlders "real-world-api/src/users/handlers"
 	userModels "real-world-api/src/users/models"
 
@@ -24,7 +25,7 @@ func GetArictles(c *gin.Context) {
 	var query arictlesQuery
 	c.ShouldBindQuery(&query)
 
-	articles, err := articleModels.GetAirticles(query.Tag, query.Author, query.Favorited, query.Limit, query.Offset)
+	articles, err := articleModels.FilterAirticles(query.Tag, query.Author, query.Favorited, query.Limit, query.Offset)
 	if err != nil {
 		panic(err)
 	}
@@ -39,7 +40,10 @@ func GetArticlesByFeed(c *gin.Context) {
 	var query arictlesQuery
 	c.ShouldBindQuery(&query)
 
-	articles, err := articleModels.GetAirticles(query.Tag, query.Author, query.Favorited, query.Limit, query.Offset)
+	value, _ := c.Get(common.KeyJwtCurentUser)
+	var currentUserModel = value.(*userModels.UserModel)
+
+	articles, err := articleModels.FilterFollowingAuthorAirticles(currentUserModel.ID, query.Tag, query.Author, query.Favorited, query.Limit, query.Offset)
 	if err != nil {
 		panic(err)
 	}
