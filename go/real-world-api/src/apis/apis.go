@@ -25,4 +25,5 @@ func UseUsersEndpoints(api *gin.RouterGroup) {
 
 	// article
 	api.GET("/articles", authNoNeedLoginMiddleware, articleHandlers.GetArictles)
+	api.GET("/articles/feed", authRequireLoginMiddleware, articleHandlers.GetArticlesByFeed)
 }
