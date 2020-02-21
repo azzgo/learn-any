@@ -53,6 +53,36 @@ func GetArticlesByFeed(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"articles": articlesJSON})
 }
 
+// GetArticle godoc
+func GetArticle(c *gin.Context)  {
+	slug := c.Param("slug")
+
+	articleModel, _ := articleModels.QueryArticle(slug)
+
+	tagNames, _ := articleModels.GetArticleTagNames(articleModel.ID)
+	author, _ := userModels.GetUserByID(articleModel.AuthorID)
+
+	articleSchema := ArticleSchema{
+		TagList: tagNames,
+		Author: userHanlders.ProfileSchema{
+			Username:  author.Username,
+			Image:     author.Image,
+			Following: false,
+			Bio:       author.Bio,
+		},
+		Slug:           articleModel.Slug,
+		Title:          articleModel.Title,
+		Description:    articleModel.Description,
+		Body:           articleModel.Body,
+		CreateAt:       articleModel.CreatedAt,
+		UpdateAt:       articleModel.UpdatedAt,
+		Favorited:      false,
+		FavoritesCount: articleModel.FavoritesCount,
+	}
+	
+	c.JSON(http.StatusOK, gin.H{"article": articleSchema})
+}
+
 func genArticlesData(articles []*articleModels.ArticleModel) []ArticleSchema {
 	var articlesJSON = make([]ArticleSchema, 0)
 

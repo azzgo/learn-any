@@ -39,6 +39,12 @@ func FilterFollowingAuthorAirticles(curUserID uint, tag string, author string, f
 	return filterAirticlesQuery(db.GetDB().Where("author_id in (?)", ids), tag, author, favorited, limit, offset)
 }
 
+// QueryArticle godoc
+func QueryArticle(slug string) (*ArticleModel, error) {
+	articleModel := new(ArticleModel)
+	err := db.GetDB().Where("slug=?", slug).First(articleModel).Error
+	return articleModel, err
+}
 
 func filterAirticlesQuery(preQuery *gorm.DB, tag string, author string, favorited string, limit uint, offset uint) ([]*ArticleModel, error) {
 	var articles = make([]*ArticleModel, 0)
