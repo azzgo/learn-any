@@ -76,6 +76,11 @@ func GetArticle(c *gin.Context)  {
 
 	articleModel, _ := articleModels.QueryArticle(slug)
 
+	if (articleModel.ID == 0) {
+		c.Status(http.StatusNotFound)
+		return
+	}
+
 	articleSchema := genSingleArticleData(articleModel)
 	
 	c.JSON(http.StatusOK, gin.H{"article": articleSchema})
@@ -141,6 +146,29 @@ func UpdateArticle(c *gin.Context)  {
 	articleSchema := genSingleArticleData(articleModel)
 
 	c.JSON(http.StatusOK, gin.H {"article": articleSchema })
+}
+
+// RemoveArticle godoc
+func RemoveArticle(c *gin.Context)  {
+	slug := c.Param("slug")
+
+	value, _ := c.Get(common.KeyJwtCurentUser)
+	var currentUserModel = value.(*userModels.UserModel)
+
+	if !articleModels.CheckArticleExistViaSlug(slug) {
+		// article not exist, directly return ok
+		c.Status(http.StatusOK)
+		return
+	} else if article, _ := articleModels.QueryArticle(slug); article.AuthorID != currentUserModel.ID {
+		c.AbortWithStatusJSON(http.StatusForbidden, common.GenErrorJSON("no permission modify the article"))
+		return
+	}
+
+	if err := articleModels.RemoveArticle(slug); err != nil {
+		panic(err)
+	}
+
+	c.Status(http.StatusOK)
 }
 
 func genSingleArticleData(article *articleModels.ArticleModel) *ArticleSchema {

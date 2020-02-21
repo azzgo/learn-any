@@ -144,6 +144,11 @@ func ModifyArticle(originSlug string, title string, description string, body str
 	return articleModel, nil
 }
 
+// RemoveArticle godoc
+func RemoveArticle(slug string) error {
+	return db.GetDB().Delete(ArticleModel{}, "slug=?", slug).Error
+}
+
 func filterAirticlesQuery(preQuery *gorm.DB, tag string, author string, favorited string, limit uint, offset uint) ([]*ArticleModel, error) {
 	var articles = make([]*ArticleModel, 0)
 	var ids []uint = make([]uint, 0)
