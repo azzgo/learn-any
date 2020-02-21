@@ -11,10 +11,10 @@ type ArticleSchema struct {
 	Title string `json:"title"`
 	Description string `json:"description"`
 	Body string `json:"body"`
-	TagList []string `json:"TagList"`
+	TagList []string `json:"tagList"`
 	CreateAt time.Time `json:"createAt"`
 	UpdateAt time.Time `json:"updateAt"`
 	Favorited bool `json:"favorited"`
 	FavoritesCount uint `json:"favoritesCount"`
-	Author userHanlders.ProfileSchema
+	Author userHanlders.ProfileSchema `json:"author"`
 }

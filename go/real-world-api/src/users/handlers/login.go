@@ -12,8 +12,8 @@ import (
 // LoginForm godoc
 type LoginForm struct {
 	User struct {
-		Email    string `form:"email" example:"jojo@jojo.io"`
-		Password string `form:"password" example:"jojojojo"`
+		Email    string `form:"email" binding:"required" example:"jojo@jojo.io"`
+		Password string `form:"password" binding:"required" example:"jojojojo"`
 	} `form:"user"`
 }
 

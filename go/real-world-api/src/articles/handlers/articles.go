@@ -12,7 +12,7 @@ import (
 )
 
 // ArictlesQuery godoc
-type arictlesQuery struct {
+type articlesQuery struct {
 	Tag       string `form:"tag"`
 	Author    string `form:"Author"`
 	Favorited string `form:"favorited"`
@@ -20,9 +20,18 @@ type arictlesQuery struct {
 	Offset    uint   `form:"offset"`
 }
 
+type artilcleForm struct {
+	Article struct {
+		Title string `form:"title" binding:"required"`
+		Description string `form:"description" binding:"required"`
+		Body string `form:"Body" binding:"required"`
+		TagList []string `form:"tagLisg"`
+	} `form:"article"`
+}
+
 // GetArictles godoc
 func GetArictles(c *gin.Context) {
-	var query arictlesQuery
+	var query articlesQuery
 	c.ShouldBindQuery(&query)
 
 	articles, err := articleModels.FilterAirticles(query.Tag, query.Author, query.Favorited, query.Limit, query.Offset)
@@ -37,7 +46,7 @@ func GetArictles(c *gin.Context) {
 
 // GetArticlesByFeed godoc
 func GetArticlesByFeed(c *gin.Context) {
-	var query arictlesQuery
+	var query articlesQuery
 	c.ShouldBindQuery(&query)
 
 	value, _ := c.Get(common.KeyJwtCurentUser)
@@ -59,8 +68,43 @@ func GetArticle(c *gin.Context)  {
 
 	articleModel, _ := articleModels.QueryArticle(slug)
 
-	tagNames, _ := articleModels.GetArticleTagNames(articleModel.ID)
-	author, _ := userModels.GetUserByID(articleModel.AuthorID)
+	articleSchema := genSingleArticleData(articleModel)
+	
+	c.JSON(http.StatusOK, gin.H{"article": articleSchema})
+}
+
+// CreateArticle godoc
+func CreateArticle(c *gin.Context)  {
+	var form artilcleForm
+	if err := c.ShouldBindJSON(&form); err != nil {
+		c.AbortWithStatusJSON(http.StatusUnprocessableEntity, common.GenErrorJSON("Title, Description, Body fields are required"))
+		return
+	}
+
+	value, _ := c.Get(common.KeyJwtCurentUser)
+	var currentUserModel = value.(*userModels.UserModel)
+
+	articleModel, err := articleModels.SaveArticle(
+		form.Article.Title,
+		form.Article.Description,
+		form.Article.Body,
+		currentUserModel.ID,
+		form.Article.TagList,
+	)
+
+	if err != nil {
+		panic(err)
+	}
+
+	articleSchema := genSingleArticleData(articleModel)
+
+
+	c.JSON(http.StatusOK, gin.H {"article": articleSchema })
+}
+
+func genSingleArticleData(article *articleModels.ArticleModel) *ArticleSchema {
+	tagNames, _ := articleModels.GetArticleTagNames(article.ID)
+	author, _ := userModels.GetUserByID(article.AuthorID)
 
 	articleSchema := ArticleSchema{
 		TagList: tagNames,
@@ -70,17 +114,17 @@ func GetArticle(c *gin.Context)  {
 			Following: false,
 			Bio:       author.Bio,
 		},
-		Slug:           articleModel.Slug,
-		Title:          articleModel.Title,
-		Description:    articleModel.Description,
-		Body:           articleModel.Body,
-		CreateAt:       articleModel.CreatedAt,
-		UpdateAt:       articleModel.UpdatedAt,
+		Slug:           article.Slug,
+		Title:          article.Title,
+		Description:    article.Description,
+		Body:           article.Body,
+		CreateAt:       article.CreatedAt,
+		UpdateAt:       article.UpdatedAt,
 		Favorited:      false,
-		FavoritesCount: articleModel.FavoritesCount,
+		FavoritesCount: article.FavoritesCount,
 	}
-	
-	c.JSON(http.StatusOK, gin.H{"article": articleSchema})
+
+	return &articleSchema
 }
 
 func genArticlesData(articles []*articleModels.ArticleModel) []ArticleSchema {

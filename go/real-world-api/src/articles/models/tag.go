@@ -18,13 +18,13 @@ func (TagModel) TableName() string {
 // GetTagRelatedArticles godoc
 func GetTagRelatedArticles(tagName string) ([]uint, error) {
 	var ids []uint
-	err := db.GetDB().Model(TagModel{Name: tagName}).Pluck("article_id", &ids).Error
+	err := db.GetDB().Find(TagModel{Name: tagName}).Pluck("article_id", &ids).Error
 	return ids, err
 }
 
 // GetArticleTagNames godoc
 func GetArticleTagNames(articleid uint) ([]string, error) {
-	var tagNames []string
-	err := db.GetDB().Model(TagModel{ArticleID: articleid}).Pluck("name", &tagNames).Error
+	var tagNames []string = make([]string, 0)
+	err := db.GetDB().Model(TagModel{}).Where("article_id=?", articleid).Pluck("name", &tagNames).Error
 	return tagNames, err
 }
