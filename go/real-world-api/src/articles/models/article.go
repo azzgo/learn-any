@@ -5,6 +5,7 @@ import (
 
 	userModels "real-world-api/src/users/models"
 
+	"github.com/google/uuid"
 	"github.com/gosimple/slug"
 	"github.com/jinzhu/gorm"
 )
@@ -47,37 +48,43 @@ func QueryArticle(slug string) (*ArticleModel, error) {
 	return articleModel, err
 }
 
-// CheckArticleExist godoc
-func CheckArticleExist(title string) bool {
+// CheckArticleExistViaTitle godoc
+func CheckArticleExistViaTitle(title string) bool {
+	var count uint
+	db.GetDB().Model(ArticleModel{}).Where("title=?", title).Count(&count)
+	return count == 1
+}
+
+// CheckArticleExistViaSlug godoc
+func CheckArticleExistViaSlug(slug string) bool {
 	var count uint
 	db.GetDB().Model(ArticleModel{}).Where("slug=?", slug).Count(&count)
 	return count == 1
 }
 
-// SaveArticle godoc
-func SaveArticle(title string, description string, body string, authorID uint, tagList []string) (*ArticleModel, error) {
+// AddArticle godoc
+func AddArticle(title string, description string, body string, authorID uint, tagList []string) (*ArticleModel, error) {
 	slug := slug.Make(title)
-	var articleModel *ArticleModel = new(ArticleModel)
-	// if there one in database
-	db.GetDB().Where("slug=?", slug).Find(articleModel)
-	if articleModel.ID == 0 {
-		articleModel = &ArticleModel{
-			Title:       title,
-			Slug:        slug,
-			Description: description,
-			Body:        body,
-			AuthorID:    authorID,
-		}
+
+	// if slug already exist
+	if CheckArticleExistViaSlug(slug) {
+		slug = slug + uuid.New().String()
+	}
+	
+	articleModel := &ArticleModel{
+		Title:       title,
+		Slug:        slug,
+		Description: description,
+		Body:        body,
+		AuthorID:    authorID,
 	}
 	// Save article
 	if err := db.GetDB().Save(articleModel).Error; err != nil {
 		return nil, err
 	}
 
-	// Save related  tagsMapping
-	if err := db.GetDB().Where("article_id = ?", articleModel.ID).Delete(TagModel{}).Error; err != nil {
-		return nil, err
-	} else if tagList != nil {
+	// Add related  tagsMapping
+	if tagList != nil {
 		err := db.GetDB().Transaction(func(tx *gorm.DB) error {
 			for _, tagName := range(tagList) {
 				if err := tx.Save(&TagModel{ArticleID: articleModel.ID, Name: tagName}).Error; err != nil {
@@ -95,6 +102,42 @@ func SaveArticle(title string, description string, body string, authorID uint, t
 
 	// save related author mapping
 	if err := db.GetDB().Save(&AuthorModel{AuthorID: authorID, ArticleID: articleModel.ID}).Error; err != nil {
+		return nil, err
+	}
+
+	return articleModel, nil
+}
+
+// ModifyArticle godoc
+func ModifyArticle(originSlug string, title string, description string, body string) (*ArticleModel, error) {
+	articleModel, err := QueryArticle(originSlug)
+	if err != nil {
+		return nil, err
+	}
+
+	if title != "" {
+		var newSlug string
+		if title != articleModel.Title {
+			newSlug = slug.Make(title)
+			if CheckArticleExistViaTitle(title) {
+				newSlug += uuid.New().String()
+			}
+			articleModel.Title = title
+			articleModel.Slug = newSlug
+		}
+	} else {
+		articleModel.Slug = originSlug
+	}
+
+	if description != "" {
+		articleModel.Description = description
+	}
+
+	if body != "" {
+		articleModel.Body = body
+	}
+
+	if err := db.GetDB().Save(articleModel).Error; err != nil {
 		return nil, err
 	}
 

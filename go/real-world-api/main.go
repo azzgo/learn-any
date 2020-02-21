@@ -36,7 +36,7 @@ func main() {
 	config := cors.DefaultConfig()
 	config.AllowOrigins = []string{"http://localhost:4100"}
 
-	r.Use(gin.Logger(), middlewares.HandleServerErrors(), cors.New(config))
+	r.Use(middlewares.HandleServerErrors(), cors.New(config), gin.Logger())
 
 	api := r.Group("/api")
 
