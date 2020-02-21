@@ -47,6 +47,13 @@ func QueryArticle(slug string) (*ArticleModel, error) {
 	return articleModel, err
 }
 
+// CheckArticleExist godoc
+func CheckArticleExist(title string) bool {
+	var count uint
+	db.GetDB().Model(ArticleModel{}).Where("slug=?", slug).Count(&count)
+	return count == 1
+}
+
 // SaveArticle godoc
 func SaveArticle(title string, description string, body string, authorID uint, tagList []string) (*ArticleModel, error) {
 	slug := slug.Make(title)

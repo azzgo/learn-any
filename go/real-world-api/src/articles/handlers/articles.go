@@ -84,6 +84,11 @@ func CreateArticle(c *gin.Context)  {
 	value, _ := c.Get(common.KeyJwtCurentUser)
 	var currentUserModel = value.(*userModels.UserModel)
 
+	if exist := articleModels.CheckArticleExist(form.Article.Title); !exist {
+		c.AbortWithStatusJSON(http.StatusUnprocessableEntity, common.GenErrorJSON("article exists"))
+		return
+	}
+
 	articleModel, err := articleModels.SaveArticle(
 		form.Article.Title,
 		form.Article.Description,
