@@ -19,6 +19,21 @@ func (CommentModel) TableName() string {
 	return "comment"
 }
 
+// QueryComments godoc
+func QueryComments(slug string) ([]*CommentModel, error) {
+	articleModel, err := QueryArticle(slug)
+
+	if err != nil {
+		return nil, err
+	}
+
+	var result []*CommentModel = make([]*CommentModel, 0)
+
+	err = db.GetDB().Model(CommentModel{}).Where("article_id=?", articleModel.ID).Scan(&result).Error
+
+	return result, err
+}
+
 // AddComment godoc
 func AddComment(articleSlug string, commentContent string, authorID uint) (*CommentModel, error) {
 
@@ -37,3 +52,20 @@ func AddComment(articleSlug string, commentContent string, authorID uint) (*Comm
 	return commentModel, err
 }
 
+
+// RemoveComment godoc
+func RemoveComment(slug string, commentID uint) error {
+	articleModel, err := QueryArticle(slug)
+	if err != nil {
+		return err
+	}
+
+	err = db.GetDB().Delete(&CommentModel{
+		ArticleID: articleModel.ID,
+		Model: gorm.Model {
+			ID: commentID,
+		},
+	}).Error
+
+	return err
+}

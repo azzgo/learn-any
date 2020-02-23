@@ -24,7 +24,9 @@ func UseUsersEndpoints(api *gin.RouterGroup) {
 	api.GET("/profiles/:username", authNoNeedLoginMiddleware, userHandlers.Profile)
 
 	// comment
+	api.GET("/articles/:slug/comments", articleHandlers.QueryComments)
 	api.POST("/articles/:slug/comments", authRequireLoginMiddleware, articleHandlers.AddComent)
+	api.DELETE("/articles/:slug/comments/:id", authRequireLoginMiddleware, articleHandlers.RemoveComment)
 
 	// article
 	api.GET("/articles", authNoNeedLoginMiddleware, articleHandlers.GetArictles)

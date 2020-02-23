@@ -9,12 +9,29 @@ import (
 	articleModels "real-world-api/src/articles/models"
 
 	"github.com/gin-gonic/gin"
+	"strconv"
 )
 
 type commentCreateForm struct {
 	Comment struct {
 		Body string `form:"body" binding:"required"`
 	} `form:"comment"`
+}
+
+func QueryComments(c *gin.Context) {
+	slug := c.Param("slug")
+
+	if results, err := articleModels.QueryComments(slug); err != nil {
+		panic(err)
+	} else {
+		commentsResult := make([]*CommentSchema, 0)
+		for _, article := range results {
+			commentsResult = append(commentsResult, genSingleCommentSchema(article))
+		}
+		c.JSON(http.StatusOK, gin.H {
+			"comments": commentsResult,
+		})
+	}
 }
 
 // AddComent godoc
@@ -55,4 +72,19 @@ func genSingleCommentSchema(commentModel *articleModels.CommentModel) *CommentSc
 		},
 	}
 	return commentSchema
+}
+
+
+// RemoveComment godoc
+func RemoveComment(c *gin.Context)  {
+	slug := c.Param("slug")
+	commentID, _ := strconv.ParseUint(c.Param("id"), 10, 32)
+
+	err := articleModels.RemoveComment(slug, uint(commentID))
+	if err != nil {
+		panic(err)
+	}
+
+	c.Status(http.StatusOK)
+	return
 }
