@@ -22,18 +22,18 @@ type articlesQuery struct {
 
 type artilcleCreateForm struct {
 	Article struct {
-		Title string `form:"title" binding:"required"`
-		Description string `form:"description" binding:"required"`
-		Body string `form:"Body" binding:"required"`
-		TagList []string `form:"tagLisg"`
+		Title       string   `form:"title" binding:"required"`
+		Description string   `form:"description" binding:"required"`
+		Body        string   `form:"Body" binding:"required"`
+		TagList     []string `form:"tagLisg"`
 	} `form:"article"`
 }
 
 type artilcleUpdateForm struct {
 	Article struct {
-		Title string `form:"title"`
+		Title       string `form:"title"`
 		Description string `form:"description"`
-		Body string `form:"Body"`
+		Body        string `form:"Body"`
 	} `form:"article"`
 }
 
@@ -49,7 +49,10 @@ func GetArictles(c *gin.Context) {
 
 	articlesJSON := genArticlesData(articles)
 
-	c.JSON(http.StatusOK, gin.H{"articles": articlesJSON})
+	c.JSON(http.StatusOK, gin.H{
+		"articles":      articlesJSON,
+		"articlesCount": len(articles),
+	})
 }
 
 // GetArticlesByFeed godoc
@@ -67,27 +70,27 @@ func GetArticlesByFeed(c *gin.Context) {
 
 	articlesJSON := genArticlesData(articles)
 
-	c.JSON(http.StatusOK, gin.H{"articles": articlesJSON})
+	c.JSON(http.StatusOK, gin.H{"articles": articlesJSON, "articlesCount": len(articles)})
 }
 
 // GetArticle godoc
-func GetArticle(c *gin.Context)  {
+func GetArticle(c *gin.Context) {
 	slug := c.Param("slug")
 
 	articleModel, _ := articleModels.QueryArticle(slug)
 
-	if (articleModel.ID == 0) {
+	if articleModel.ID == 0 {
 		c.Status(http.StatusNotFound)
 		return
 	}
 
 	articleSchema := genSingleArticleData(articleModel)
-	
+
 	c.JSON(http.StatusOK, gin.H{"article": articleSchema})
 }
 
 // CreateArticle godoc
-func CreateArticle(c *gin.Context)  {
+func CreateArticle(c *gin.Context) {
 	var form artilcleCreateForm
 	if err := c.ShouldBindJSON(&form); err != nil {
 		c.AbortWithStatusJSON(http.StatusUnprocessableEntity, common.GenErrorJSON("Title, Description, Body fields are required"))
@@ -111,12 +114,11 @@ func CreateArticle(c *gin.Context)  {
 
 	articleSchema := genSingleArticleData(articleModel)
 
-
-	c.JSON(http.StatusOK, gin.H {"article": articleSchema })
+	c.JSON(http.StatusOK, gin.H{"article": articleSchema})
 }
 
 // UpdateArticle godoc
-func UpdateArticle(c *gin.Context)  {
+func UpdateArticle(c *gin.Context) {
 	var form artilcleUpdateForm
 	c.ShouldBindJSON(&form)
 	originSlug := c.Param("slug")
@@ -145,11 +147,11 @@ func UpdateArticle(c *gin.Context)  {
 
 	articleSchema := genSingleArticleData(articleModel)
 
-	c.JSON(http.StatusOK, gin.H {"article": articleSchema })
+	c.JSON(http.StatusOK, gin.H{"article": articleSchema})
 }
 
 // RemoveArticle godoc
-func RemoveArticle(c *gin.Context)  {
+func RemoveArticle(c *gin.Context) {
 	slug := c.Param("slug")
 
 	value, _ := c.Get(common.KeyJwtCurentUser)

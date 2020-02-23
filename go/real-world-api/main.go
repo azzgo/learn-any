@@ -47,6 +47,7 @@ func main() {
 		&articleModels.ArticleModel{},
 		&articleModels.TagModel{},
 		&articleModels.AuthorModel{},
+		&articleModels.CommentModel{},
 	)
 	defer db.Close()
 
