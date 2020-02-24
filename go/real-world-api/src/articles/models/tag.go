@@ -28,3 +28,10 @@ func GetArticleTagNames(articleid uint) ([]string, error) {
 	err := db.GetDB().Model(TagModel{}).Where("article_id=?", articleid).Pluck("name", &tagNames).Error
 	return tagNames, err
 }
+
+// GetTagList godoc
+func GetTagList() ([]string, error) {
+	var tagNames []string = make([]string, 0)
+	err := db.GetDB().Model(TagModel{}).Pluck("name", &tagNames).Error
+	return tagNames, err
+}

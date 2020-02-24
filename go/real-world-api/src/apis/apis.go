@@ -35,4 +35,9 @@ func UseUsersEndpoints(api *gin.RouterGroup) {
 	api.POST("/articles", authRequireLoginMiddleware, articleHandlers.CreateArticle)
 	api.PUT("/articles/:slug", authRequireLoginMiddleware, articleHandlers.UpdateArticle)
 	api.DELETE("/articles/:slug", authRequireLoginMiddleware, articleHandlers.RemoveArticle)
+	api.POST("/articles/:slug/favorite", authRequireLoginMiddleware, articleHandlers.FavoriteArticle)
+	api.DELETE("/articles/:slug/favorite", authRequireLoginMiddleware, articleHandlers.UnFavoriteArticle)
+
+	// tags
+	api.GET("/tags")
 }

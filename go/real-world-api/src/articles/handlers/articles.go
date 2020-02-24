@@ -42,12 +42,18 @@ func GetArictles(c *gin.Context) {
 	var query articlesQuery
 	c.ShouldBindQuery(&query)
 
+	var userID uint = 0
+	if value, _ := c.Get(common.KeyJwtCurentUser); value != nil {
+		var currentUserModel = value.(*userModels.UserModel)
+		userID = currentUserModel.ID
+	}
+
 	articles, err := articleModels.FilterAirticles(query.Tag, query.Author, query.Favorited, query.Limit, query.Offset)
 	if err != nil {
 		panic(err)
 	}
 
-	articlesJSON := genArticlesData(articles)
+	articlesJSON := genArticlesData(articles, userID)
 
 	c.JSON(http.StatusOK, gin.H{
 		"articles":      articlesJSON,
@@ -68,7 +74,7 @@ func GetArticlesByFeed(c *gin.Context) {
 		panic(err)
 	}
 
-	articlesJSON := genArticlesData(articles)
+	articlesJSON := genArticlesData(articles, currentUserModel.ID)
 
 	c.JSON(http.StatusOK, gin.H{"articles": articlesJSON, "articlesCount": len(articles)})
 }
@@ -84,7 +90,7 @@ func GetArticle(c *gin.Context) {
 		return
 	}
 
-	articleSchema := genSingleArticleData(articleModel)
+	articleSchema := genSingleArticleData(articleModel, 0)
 
 	c.JSON(http.StatusOK, gin.H{"article": articleSchema})
 }
@@ -112,7 +118,7 @@ func CreateArticle(c *gin.Context) {
 		panic(err)
 	}
 
-	articleSchema := genSingleArticleData(articleModel)
+	articleSchema := genSingleArticleData(articleModel, currentUserModel.ID)
 
 	c.JSON(http.StatusOK, gin.H{"article": articleSchema})
 }
@@ -145,7 +151,7 @@ func UpdateArticle(c *gin.Context) {
 		panic(err)
 	}
 
-	articleSchema := genSingleArticleData(articleModel)
+	articleSchema := genSingleArticleData(articleModel, currentUserModel.ID)
 
 	c.JSON(http.StatusOK, gin.H{"article": articleSchema})
 }
@@ -173,9 +179,58 @@ func RemoveArticle(c *gin.Context) {
 	c.Status(http.StatusOK)
 }
 
-func genSingleArticleData(article *articleModels.ArticleModel) *ArticleSchema {
+// FavoriteArticle godoc
+func FavoriteArticle(c *gin.Context) {
+	slug := c.Param("slug")
+
+	value, _ := c.Get(common.KeyJwtCurentUser)
+	var currentUserModel = value.(*userModels.UserModel)
+
+	if articleModel, _ := articleModels.QueryArticle(slug); articleModel.ID == 0 {
+		c.AbortWithStatusJSON(http.StatusNotFound, common.GenErrorJSON("article not exist"))
+	} else {
+		err := articleModels.Favorite(currentUserModel.ID, articleModel.ID)
+		if err != nil {
+			panic(err)
+		}
+
+		// Requery for right data
+		articleModel, _ := articleModels.QueryArticle(slug)
+		c.JSON(http.StatusOK, gin.H{
+			"article": genSingleArticleData(articleModel, currentUserModel.ID),
+		})
+	}
+}
+
+// UnFavoriteArticle godoc
+func UnFavoriteArticle(c *gin.Context) {
+	slug := c.Param("slug")
+
+	value, _ := c.Get(common.KeyJwtCurentUser)
+	var currentUserModel = value.(*userModels.UserModel)
+
+	if articleModel, _ := articleModels.QueryArticle(slug); articleModel.ID == 0 {
+		c.AbortWithStatusJSON(http.StatusNotFound, common.GenErrorJSON("article not exist"))
+	} else {
+		err := articleModels.UnFavorite(currentUserModel.ID, articleModel.ID)
+		if err != nil {
+			panic(err)
+		}
+
+		// Requery for right data
+		articleModel, _ := articleModels.QueryArticle(slug)
+
+		c.JSON(http.StatusOK, gin.H{
+			"article": genSingleArticleData(articleModel, currentUserModel.ID),
+		})
+	}
+}
+
+func genSingleArticleData(article *articleModels.ArticleModel, curUserID uint) *ArticleSchema {
 	tagNames, _ := articleModels.GetArticleTagNames(article.ID)
 	author, _ := userModels.GetUserByID(article.AuthorID)
+	isFavorite := articleModels.GetFavoriteState(curUserID, article.ID)
+	favoriteCount := articleModels.ArticleFavoritedCount(article.ID)
 
 	articleSchema := ArticleSchema{
 		TagList: tagNames,
@@ -191,37 +246,18 @@ func genSingleArticleData(article *articleModels.ArticleModel) *ArticleSchema {
 		Body:           article.Body,
 		CreateAt:       article.CreatedAt,
 		UpdateAt:       article.UpdatedAt,
-		Favorited:      false,
-		FavoritesCount: article.FavoritesCount,
+		Favorited:      isFavorite,
+		FavoritesCount: favoriteCount,
 	}
 
 	return &articleSchema
 }
 
-func genArticlesData(articles []*articleModels.ArticleModel) []ArticleSchema {
-	var articlesJSON = make([]ArticleSchema, 0)
+func genArticlesData(articles []*articleModels.ArticleModel, curUserID uint) []*ArticleSchema {
+	var articlesJSON = make([]*ArticleSchema, 0)
 
 	for _, article := range articles {
-		tagNames, _ := articleModels.GetArticleTagNames(article.ID)
-		author, _ := userModels.GetUserByID(article.AuthorID)
-
-		articlesJSON = append(articlesJSON, ArticleSchema{
-			TagList: tagNames,
-			Author: userHanlders.ProfileSchema{
-				Username:  author.Username,
-				Image:     author.Image,
-				Following: false,
-				Bio:       author.Bio,
-			},
-			Slug:           article.Slug,
-			Title:          article.Title,
-			Description:    article.Description,
-			Body:           article.Body,
-			CreateAt:       article.CreatedAt,
-			UpdateAt:       article.UpdatedAt,
-			Favorited:      false,
-			FavoritesCount: article.FavoritesCount,
-		})
+		articlesJSON = append(articlesJSON, genSingleArticleData(article, curUserID))
 	}
 
 	return articlesJSON

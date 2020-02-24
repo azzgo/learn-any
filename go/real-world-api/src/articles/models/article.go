@@ -18,8 +18,6 @@ type ArticleModel struct {
 	Description string `gorm:"size:512"`
 	Body        string `gorm:"type:text"`
 	AuthorID    uint
-	// Favorited
-	FavoritesCount uint `gorm:"default:0"`
 }
 
 // TableName godoc
@@ -44,8 +42,11 @@ func FilterFollowingAuthorAirticles(curUserID uint, tag string, author string, f
 // QueryArticle godoc
 func QueryArticle(slug string) (*ArticleModel, error) {
 	articleModel := new(ArticleModel)
-	err := db.GetDB().Where("slug=?", slug).First(articleModel).Error
-	return articleModel, err
+	if err := db.GetDB().Where("slug=?", slug).First(articleModel).Error; err != nil {
+		return nil, err
+	}
+
+	return articleModel, nil
 }
 
 // CheckArticleExistViaTitle godoc
@@ -70,7 +71,7 @@ func AddArticle(title string, description string, body string, authorID uint, ta
 	if CheckArticleExistViaSlug(slug) {
 		slug = slug + uuid.New().String()
 	}
-	
+
 	articleModel := &ArticleModel{
 		Title:       title,
 		Slug:        slug,
@@ -86,7 +87,7 @@ func AddArticle(title string, description string, body string, authorID uint, ta
 	// Add related  tagsMapping
 	if tagList != nil {
 		err := db.GetDB().Transaction(func(tx *gorm.DB) error {
-			for _, tagName := range(tagList) {
+			for _, tagName := range tagList {
 				if err := tx.Save(&TagModel{ArticleID: articleModel.ID, Name: tagName}).Error; err != nil {
 					return err
 				}
