@@ -21,6 +21,10 @@ public class Rational {
     }
 
     Rational(int numerator, int denominator) {
+        assert numerator < Integer.MAX_VALUE;
+        assert numerator > Integer.MIN_VALUE;
+        assert denominator < Integer.MAX_VALUE;
+        assert denominator > Integer.MIN_VALUE;
 
         int cd = gcd(Math.abs(numerator), Math.abs(denominator));
 
