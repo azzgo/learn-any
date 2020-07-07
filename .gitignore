@@ -4,3 +4,6 @@ target/
 **.setting/
 **bin/
 **.project
+**.gradle/
+**.idea/
+java/out/
