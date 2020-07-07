@@ -1,12 +1,16 @@
-struct Stack<T> {
+struct VecStack<T> {
     items: Vec<T>,
 }
 
 
-impl<T> Stack<T> {
-    pub fn pop(&mut self) -> Option<T> {
+impl<T> VecStack<T> {
+    pub fn pop(&mut self) -> Result<T, &str> {
         let item = self.items.pop();
-        return item;
+        match item {
+            Some(item) => Ok(item),
+            None => Err("Empty stack can not pop!")
+        }
+
     }
 
     
@@ -23,26 +27,26 @@ impl<T> Stack<T> {
     }
 }
 
-impl<T> Stack<T> {
-    pub fn new() -> Stack<T>{
-        return Stack { items: Vec::new() }
+impl<T> VecStack<T> {
+    pub fn new() -> VecStack<T>{
+        return VecStack { items: Vec::new() }
     }
 }
 
 #[cfg(test)]
 mod tests {
-    use super::Stack;
+    use super::VecStack;
 
     #[test]
     fn it_should_create_normal() {
-        let mut stack = Stack::<i32>::new();
+        let mut stack = VecStack::<i32>::new();
         assert!(stack.is_empty());
         stack.push(3);
         stack.push(6);
         assert!(!stack.is_empty());
         assert_eq!(stack.len(), 2);
         let num = stack.pop();
-        if let Some(n) = num {
+        if let Ok(n) = num {
             assert_eq!(n, 6);
         }
     }
