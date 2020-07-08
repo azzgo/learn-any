@@ -1,3 +1,4 @@
+#[derive(Debug)]
 struct VecStack<T> {
     items: Vec<T>,
 }
@@ -84,5 +85,30 @@ mod tests {
         assert!(check_parenthese("[()]{}{[()()]()}"));
         assert!(!check_parenthese("[(])"));
         assert!(check_parenthese("[]{}[,]"));
+    }
+
+
+    #[test]
+    fn it_final_stack_should_be_size1_and_it_item() {
+        let mut stack = VecStack::new();
+        stack.push("it");
+        stack.push("was");
+        let _ = stack.pop();
+        stack.push("the");
+        stack.push("best");
+        let _ = stack.pop();
+        stack.push("of");
+        stack.push("times");
+        let _ = stack.pop();
+        let _ = stack.pop();
+        let _ = stack.pop();
+        stack.push("it");
+        stack.push("was");
+        let _ = stack.pop();
+        stack.push("the");
+        let _ = stack.pop();
+        let _ = stack.pop();
+        assert_eq!(stack.len(), 1);
+        assert_eq!(&"it", stack.peek().unwrap());
     }
 }
