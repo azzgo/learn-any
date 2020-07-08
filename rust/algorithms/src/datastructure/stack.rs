@@ -83,5 +83,6 @@ mod tests {
     fn it_used_to_match_brackets() {
         assert!(check_parenthese("[()]{}{[()()]()}"));
         assert!(!check_parenthese("[(])"));
+        assert!(check_parenthese("[]{}[,]"));
     }
 }
