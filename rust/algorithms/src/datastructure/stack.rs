@@ -63,6 +63,8 @@ fn check_parenthese(bracket_str: &str) -> bool {
     return match_bracket_stack.len() == 0;
 }
 
+
+
 #[cfg(test)]
 mod tests {
     use super::VecStack;
@@ -113,4 +115,24 @@ mod tests {
         assert_eq!(stack.len(), 1);
         assert_eq!(&"it", stack.peek().unwrap());
     }
+
+
+    #[test]
+    fn it_should_complete_str() {
+        let mut stack = VecStack::<String>::new();
+        let input = "1 + 2 ) * 3 - 4 ) * 5 - 6 ) ) )";
+        for char in input.chars() {
+            if char == ')' {
+                let num2 = stack.pop().unwrap();
+                let ops = stack.pop().unwrap();
+                let num1 = stack.pop().unwrap();
+                stack.push("( ".to_string() + &num1 + " " + &ops + " "  + &num2 + " )");
+            } else if char != ' ' {
+                stack.push(char.to_string());
+            }
+        }
+
+        assert_eq!(stack.pop().unwrap(), "( ( 1 + 2 ) * ( ( 3 - 4 ) * ( 5 - 6 ) ) )")
+    }
 }
+
