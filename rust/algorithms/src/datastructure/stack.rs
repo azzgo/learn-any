@@ -63,12 +63,10 @@ fn check_parenthese(bracket_str: &str) -> bool {
     return match_bracket_stack.len() == 0;
 }
 
-
-
 #[cfg(test)]
 mod tests {
-    use super::VecStack;
     use super::check_parenthese;
+    use super::VecStack;
 
     #[test]
     fn it_should_create_normal() {
@@ -91,10 +89,8 @@ mod tests {
         assert!(check_parenthese("[]{}[,]"));
     }
 
-
     #[test]
     fn it_should_convert_infix_to_prepostfix() {
-
         let input = "2*3/(2-1)+3*(4-1)";
 
         let _expect_prefix = "+/*23-2*3-41";
@@ -109,9 +105,12 @@ mod tests {
             }
 
             if ')' == char {
-              while *stack.peek().unwrap() != '(' {
-                  output.push(stack.pop().unwrap());
-              }
+                while *stack.peek().unwrap() != '(' {
+                    output.push(stack.pop().unwrap());
+                }
+
+                // pop (
+                let _ = stack.pop();
             }
 
             if "0123456789".contains(char) {
@@ -119,23 +118,22 @@ mod tests {
             }
 
             if "+-*/".contains(char) {
-               let top_char = stack.peek().unwrap_or(&' ');
-               if !stack.is_empty() && *top_char != '(' {
-                   if "+-".contains(char) && !"*/".contains(*top_char) {
-                       output.push(stack.pop().unwrap())
-                   }
-                   stack.push(char);
-               }
+                let top_char = stack.peek().unwrap_or(&' ');
+                if !stack.is_empty() && *top_char != '(' {
+                    if !("+-".contains(char) && "*/".contains(*top_char)) {
+                        output.push(stack.pop().unwrap());
+                    }
+                }
+                stack.push(char);
             }
+        }
 
+        while !stack.is_empty() {
+            output.push(stack.pop().unwrap());
         }
 
         assert_eq!(&output, &expect_postfix);
-
-
-
     }
-
 
     #[test]
     fn it_final_stack_should_be_size1_and_it_item() {
@@ -161,7 +159,6 @@ mod tests {
         assert_eq!(&"it", stack.peek().unwrap());
     }
 
-
     #[test]
     fn it_should_complete_str() {
         let mut stack = VecStack::<String>::new();
@@ -171,13 +168,15 @@ mod tests {
                 let num2 = stack.pop().unwrap();
                 let ops = stack.pop().unwrap();
                 let num1 = stack.pop().unwrap();
-                stack.push("( ".to_string() + &num1 + " " + &ops + " "  + &num2 + " )");
+                stack.push("( ".to_string() + &num1 + " " + &ops + " " + &num2 + " )");
             } else if char != ' ' {
                 stack.push(char.to_string());
             }
         }
 
-        assert_eq!(stack.pop().unwrap(), "( ( 1 + 2 ) * ( ( 3 - 4 ) * ( 5 - 6 ) ) )")
+        assert_eq!(
+            stack.pop().unwrap(),
+            "( ( 1 + 2 ) * ( ( 3 - 4 ) * ( 5 - 6 ) ) )"
+        )
     }
 }
-
