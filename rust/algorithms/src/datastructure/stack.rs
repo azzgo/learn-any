@@ -93,6 +93,51 @@ mod tests {
 
 
     #[test]
+    fn it_should_convert_infix_to_prepostfix() {
+
+        let input = "2*3/(2-1)+3*(4-1)";
+
+        let _expect_prefix = "+/*23-2*3-41";
+        let expect_postfix = "23*21-/41-3*+";
+
+        // 中序转后序
+        let mut stack = VecStack::<char>::new();
+        let mut output = String::new();
+        for char in input.chars() {
+            if '(' == char {
+                stack.push('(');
+            }
+
+            if ')' == char {
+              while *stack.peek().unwrap() != '(' {
+                  output.push(stack.pop().unwrap());
+              }
+            }
+
+            if "0123456789".contains(char) {
+                output.push(char)
+            }
+
+            if "+-*/".contains(char) {
+               let top_char = stack.peek().unwrap_or(&' ');
+               if !stack.is_empty() && *top_char != '(' {
+                   if "+-".contains(char) && !"*/".contains(*top_char) {
+                       output.push(stack.pop().unwrap())
+                   }
+                   stack.push(char);
+               }
+            }
+
+        }
+
+        assert_eq!(&output, &expect_postfix);
+
+
+
+    }
+
+
+    #[test]
     fn it_final_stack_should_be_size1_and_it_item() {
         let mut stack = VecStack::new();
         stack.push("it");
