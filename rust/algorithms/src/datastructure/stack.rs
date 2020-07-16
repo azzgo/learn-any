@@ -94,7 +94,7 @@ mod tests {
         let input = "2*3/(2-1)+3*(4-1)";
 
         let _expect_prefix = "+/*23-2*3-41";
-        let expect_postfix = "23*21-/41-3*+";
+        let expect_postfix = "23*21-/341-*+";
 
         // 中序转后序
         let mut stack = VecStack::<char>::new();
@@ -120,7 +120,7 @@ mod tests {
             if "+-*/".contains(char) {
                 let top_char = stack.peek().unwrap_or(&' ');
                 if !stack.is_empty() && *top_char != '(' {
-                    if !("+-".contains(char) && "*/".contains(*top_char)) {
+                    if !("*/".contains(char) && "+-".contains(*top_char)) {
                         output.push(stack.pop().unwrap());
                     }
                 }
