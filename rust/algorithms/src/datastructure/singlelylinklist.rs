@@ -41,6 +41,36 @@ impl<T> SinglelyLinkList<T> {
     pub fn push(&mut self, item: T) {
 
     }
+
+    pub fn delete(&mut self, k: usize) -> Option<T> {
+        if k > self.length {
+            return None;
+        }
+
+        let mut cur = &self.head;
+        let mut prev: &Option<Box<Node<T>>> = &None;
+        let mut loop_index = 0;
+
+        loop {
+            if let Some(node) = cur {
+                if loop_index == k {
+                    return match prev {
+                        Some(prev) => {
+                            prev.as_mut().next = node.next;
+                            return Some(node.item);
+                        },
+                        None => None,
+                    }
+                }
+
+                prev = cur;
+                cur = &node.next;
+                loop_index += 1;
+            } else {
+                return None;
+            }
+        }
+    }
 }
 
 #[cfg(test)]
@@ -52,8 +82,10 @@ mod tests {
     fn it_should_be_none() {
         let link_list = SinglelyLinkList::<i32>::new();
 
-        let delete_node = link_list.get(3);
+        let get_node = link_list.get(3);
+        let delete_node = link_list.delete(3);
 
-        delete_node.expect_none("期望返回 None");
+        get_node.expect_none("期望返回 None");
+        delete_node.expect_none("期望返回none")
     }
 }
