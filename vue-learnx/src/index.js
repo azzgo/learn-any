@@ -25,13 +25,11 @@ new Watcher(testObj, 'g', function(newVal) {
 });
 
 new Watcher(testObj, 'g.4.h', function(newVal) {
-  // assert.strictEqual(newVal, 6);
-  console.log('g.4.h:' + newVal)
+  assert.strictEqual(newVal, 5);
 });
 
 new Watcher(testObj, 'g.0', function(newVal) {
-  // assert.strictEqual(newVal, 6);
-  console.log('g.0:' + newVal)
+  assert.strictEqual(newVal, 1);
 });
 
 
