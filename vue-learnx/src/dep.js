@@ -1,21 +1,18 @@
 import globalState from "./globalState";
 
+// 简单的订阅发布模式
 export class Dep {
   constructor() {
     this.subs = [];
   }
 
-  addSub(sub) {
+  _addSub(sub) {
     this.subs.push(sub);
-  }
-
-  removeSub(sub) {
-    remove(this.subs, sub);
   }
 
   depend() {
     if (globalState.target) {
-      this.addSub(globalState.target);
+      this._addSub(globalState.target);
     }
   }
 
@@ -26,6 +23,12 @@ export class Dep {
     }
   }
 
+  // useless code
+  removeSub(sub) {
+    remove(this.subs, sub);
+  }
+
+  // useless code
   remove(arr, item) {
     if (arr.length) {
       const index = arr.indexOf(item);

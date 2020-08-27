@@ -1,13 +1,15 @@
 import { def } from './utils';
 
-const arraryProto = Array.prototype;
+const arrayProto = Array.prototype;
 
-export const arraryMethods = Object.create(arraryProto);
+// 拷贝一份 Array 的原型方法
+export const arraryMethods = Object.create(arrayProto);
 
 ['push', 'pop', 'shift', 'unshift', 'splice', 'sort', 'reverse'].forEach(
   method => {
     const originMethod = arraryMethods[method];
 
+    // 改写拷贝的 Array 原型方法
     def(arraryMethods, method, function mutator(...args) {
       const result = originMethod.apply(this, args);
       const ob = this.__ob__;
