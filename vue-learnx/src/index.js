@@ -14,7 +14,9 @@ let testObj = {
   g: [1, 2, 3, 4],
 };
 
+
 new Observer(testObj);
+
 
 new Watcher(testObj, 'b.c', function(newVal) {
   assert.strictEqual(newVal, 3);
@@ -33,6 +35,9 @@ new Watcher(testObj, 'g.0', function(newVal) {
 });
 
 
+
 testObj.b.c++;
 
 testObj.g.push({ h: 5});
+
+testObj.g[4]++;

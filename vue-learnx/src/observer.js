@@ -10,6 +10,7 @@ export function defineReactive(data, key, val) {
     enumerable: true,
     configurable: true,
     get: function() {
+      // 处理属性
       dep.depend();
       ob && ob.dep.depend();
       return val;

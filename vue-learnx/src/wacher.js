@@ -24,7 +24,9 @@ export default class Watcher {
 
 const bailRE = /[^\w.$]/;
 /**
- * @param {string} path
+ * @description 解析路径, 返回一个对应路径的 getter，getter 会尝试获取传入对象的指定路径下的值
+ * @param {string} path "a.1.b" 的形式
+ * @returns {(obj: object) => any } 返回传入对象的指定路径下的值, 取不到返回 undefined
  */
 function parsePath(path) {
   if (bailRE.test(path)) {
