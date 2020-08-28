@@ -1,5 +1,5 @@
-import { Observer } from './observer';
-import Watcher from './wacher';
+import { Observer } from './data-binding/observer';
+import Watcher from './data-binding/wacher';
 import * as assert from 'assert';
 
 let testObj = {
