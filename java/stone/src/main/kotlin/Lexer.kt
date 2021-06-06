@@ -7,6 +7,7 @@ import java.util.regex.Pattern
 
 private const val regexPat =
     "\\s*((//.*)|([0-9]+)|(\"(\\\\\"|\\\\\\\\|\\\\n|[^\"])*\")" + "|[A-Za-z][A-Za-z0-9]*|==|<=|>=|&&|\\|\\||\\p{Punct})?"
+    // 匹配任意 Group2 注释 | Group3 整型 | Group4 字符串 | Group5 标志符
 
 open class Lexer(
     r: Reader
@@ -99,8 +100,10 @@ open class Lexer(
     }
 
     private fun addToken(lingNo: Int, matcher: Matcher) {
+        // regex can match
         val m = matcher.group(1)
         if (m != null) {
+            //  if not match comment
             if (matcher.group(2) == null) {
                 val token: Token = when {
                     matcher.group(3) != null -> {
