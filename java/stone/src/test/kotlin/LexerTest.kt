@@ -9,27 +9,23 @@ import kotlin.test.assertEquals
 internal class LexerTest {
     @Test
     fun givenACodeStringItWillParseAsTokenList() = runBlocking {
-        val InputCode = """
-           while i < 10 {
+        val InputCode = """while i < 10 {
                 sum = sum + i
                 i=i+1
             }
-            sum
-        """
+            sum"""
         val l = Lexer(InputCode.reader())
 
 
         val tokenList = flow<String> {
-            var t: Token
-            while ((l.read().also { t = it }) != Token.EOF) {
+            do {
+                val t: Token = l.read()
                 emit(t.getText())
-            }
+            } while (t != Token.EOF)
         }.toList()
 
         assertEquals(
-            tokenList,
             listOf(
-                "\\n",
                 "while",
                 "i",
                 "<",
@@ -52,8 +48,9 @@ internal class LexerTest {
                 "\\n",
                 "sum",
                 "\\n",
-                "\\n"
-            )
+                ""   // EOF text
+            ),
+            tokenList
         )
     }
 
