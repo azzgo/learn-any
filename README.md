@@ -1,2 +1,3 @@
 # learn-any
-啥都瞎试试
+
+Try for fun. That is life.
