@@ -1,7 +1,5 @@
 package top.azzgo.datastructure
 
-import top.azzgo.datastructure.Rational
-
 class Rational internal constructor(numerator: Int, denominator: Int) {
     var numerator = 0
     var denominator = 0

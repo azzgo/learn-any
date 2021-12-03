@@ -2,7 +2,7 @@ package top.azzgo.datastructure
 
 import junit.framework.TestCase
 
-object RationalTest : TestCase() {
+class RationalTest : TestCase() {
     fun testPlus() {
         val a = Rational(4, 6)
         val b = Rational(1, 2)
