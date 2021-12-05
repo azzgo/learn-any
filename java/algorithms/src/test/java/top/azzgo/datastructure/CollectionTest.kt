@@ -43,9 +43,24 @@ class CollectionTest : TestCase() {
         Assert.assertEquals(mean, 100.60)
     }
 
+    fun testQueue() {
+        val testData = listOf("to", "be", "or", "not", "to", "-", "be", "-", "-", "that", "-", "-", "-", "is")
+        val quene = Quene<String>()
+        for (data in testData) {
+            if (data != "-") {
+                quene.enqueue(data)
+            }
+            else if (!quene.isEmpty()) {
+                print(quene.dequeue() + " ")
+            }
+        }
+
+        Assert.assertEquals(quene.size(), 2);
+    }
 
     fun testStack() {
-       val stack: Stack<String> = ResizingStack<String>();
+//       val stack: Stack<String> = ResizingStack<String>();
+        val stack: Stack<String> = LinkStack<String>()
 
         stack.push("1")
         stack.push("2")
