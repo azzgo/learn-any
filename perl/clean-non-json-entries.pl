@@ -11,8 +11,8 @@ if (not -d "dist") {
 
 foreach my $har (@hars) {
   $har =~ s/^\s+|\s+$//g;
-  my $url = qx(
-    cat $har | jq ".log.entries[0].request.url"
+  my $jsonEntries = qx(
+    cat $har | jq ".log.entries | map(select(.response.status == 200 and .response.content.mimeType == \\"application\/json\\"))"
   );
 
   my $har_file_name = `basename $har`;
@@ -20,7 +20,7 @@ foreach my $har (@hars) {
 
   my $wfile = undef;
   open($wfile, ">dist/$har_file_name") or die "can not write to file dist/$har_file_name";
-  print $wfile $url;
+  print $wfile $jsonEntries;
   close $wfile;
 }
 
